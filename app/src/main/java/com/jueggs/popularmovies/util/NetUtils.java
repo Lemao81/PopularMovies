@@ -1,5 +1,8 @@
 package com.jueggs.popularmovies.util;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
@@ -10,11 +13,11 @@ import java.net.URL;
 
 public class NetUtils
 {
-    public static final String TAG = "NetUtils";
+    public static final String TAG = NetUtils.class.getSimpleName();
 
-    public static InputStream getStream(Uri uri)
+    public static String getData(Uri uri)
     {
-        InputStream is = null;
+        String result = null;
         HttpURLConnection connection = null;
         try
         {
@@ -22,7 +25,8 @@ public class NetUtils
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            is = connection.getInputStream();
+            InputStream is = connection.getInputStream();
+            result = IOUtils.readStream(is);
         }
         catch (IOException e)
         {
@@ -35,6 +39,13 @@ public class NetUtils
                 connection.disconnect();
             }
         }
-        return is;
+        return result;
+    }
+
+    public static boolean isNetworkAvailable(Context context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }

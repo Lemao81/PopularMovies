@@ -3,7 +3,8 @@ package com.jueggs.popularmovies.data;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import com.jueggs.popularmovies.Movie;
+import android.util.Log;
+import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.util.IOUtils;
 import com.jueggs.popularmovies.util.NetUtils;
 
@@ -13,7 +14,7 @@ import static com.jueggs.popularmovies.data.MovieContract.*;
 
 public class FetchService
 {
-    public static final String TAG = "FetchService";
+    public static final String TAG = FetchService.class.getSimpleName();
 
     private static FetchService instance;
 
@@ -39,21 +40,19 @@ public class FetchService
         {
             int sortorder = params[0];
 
-            Uri uri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(PATHS.get(sortorder))
-                    .appendQueryParameter(QUERY_KEY_APIKEY,API_KEY).build();
+            Uri uri = Uri.parse(BASE_URL_MOVIES).buildUpon()
+                    .appendEncodedPath(PATHS.get(sortorder))
+                    .appendQueryParameter(QUERY_KEY_APIKEY, API_KEY).build();
 
-            String jsonString = IOUtils.readStream(NetUtils.getStream(uri));
+            String jsonString = NetUtils.getData(uri);
 
             if (TextUtils.isEmpty(jsonString))
             {
+                Log.e(TAG, "no useful json string retrieved");
                 return null;
             }
 
-
-
-
-            return null;
+            return IOUtils.getMovieListFromJSON(jsonString);
         }
 
         @Override
@@ -63,10 +62,11 @@ public class FetchService
             {
                 if (movies != null)
                 {
-                    callback.onMoviesLoaded(sortorder, RC_OK, movies);
+                    callback.onMoviesLoaded(sortorder, RC_OK_NETWORK, movies);
                 }
                 else
                 {
+                    Log.e(TAG, "something went wrong during fetching, returned null");
                     callback.onMoviesLoaded(sortorder, RC_ERROR, null);
                 }
             }

@@ -1,74 +1,72 @@
 package com.jueggs.popularmovies;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.Toast;
+import com.jueggs.popularmovies.data.CachedRepository;
+import com.jueggs.popularmovies.model.Movie;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static com.jueggs.popularmovies.MovieDbAPI.*;
+import static com.jueggs.popularmovies.data.MovieContract.*;
+
 
 public class MoviesFragment extends Fragment
 {
+    public static final String TAG = MoviesFragment.class.getSimpleName();
+
     private MoviesAdapter moviesAdapter;
-    private Cache cache = Cache.getInstance();
+    private CachedRepository repository;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_movies, container, false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         GridView gridView = (GridView) view.findViewById(R.id.gridView);
         moviesAdapter = new MoviesAdapter(getContext(), 0, new ArrayList<Movie>());
         gridView.setAdapter(moviesAdapter);
 
-        Date today = new Date();
-        if (cache.hasPopularMoviesUpToDate(today))
-        {
-            moviesAdapter.addAll(cache.getMoviesPopular());
-        }
-        else if (cache.hasPopularMoviesExpired(today))
-        {
-            boolean success = tryFetchMovies(SortType.POPULAR);
-            moviesAdapter.addAll(cache.getMoviesPopular());
-        }
+        repository = CachedRepository.getInstance(getActivity().getApplicationContext());
+        repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback);
 
         return view;
     }
 
-    private boolean networkAvailable()
+    private Callback moviesLoadedCallback=new Callback()
     {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
-    }
-
-    private class FetchMoviesTask extends AsyncTask<SortType, Void, List<Movie>>
-    {
-
         @Override
-        protected List<Movie> doInBackground(SortType... params)
+        public void onMoviesLoaded(int sortorder, int resultCode, List<Movie> movies)
         {
-
-            return null;
+            switch (resultCode)
+            {
+                case RC_OK_CACHE:
+                    moviesAdapter.clear();
+                    moviesAdapter.addAll(movies);
+                    break;
+                case RC_OK_NETWORK:
+                    moviesAdapter.clear();
+                    moviesAdapter.addAll(movies);
+                    Toast.makeText(getContext(), "Updated movie list", Toast.LENGTH_LONG).show();
+                    break;
+                case RC_NO_NETWORK:
+                    Toast.makeText(getContext(), "No network available :(", Toast.LENGTH_LONG).show();
+                    break;
+                case RC_ERROR:
+                    Toast.makeText(getContext(), "An inexplicable error occurred during network access", Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Log.e(TAG, "unknown result code");
+            }
         }
+    };
 
-        @Override
-        protected void onPostExecute(List<Movie> movies)
-        {
-            super.onPostExecute(movies);
-        }
-    }
 }
