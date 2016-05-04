@@ -23,6 +23,7 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 public class RankingFragment extends Fragment
 {
     public static final String TAG = RankingFragment.class.getSimpleName();
+    public static final String STATE_SORTORDER = "STATE_SORTORDER";
 
     private RankingAdapter rankingAdapter;
     private CachedRepository repository;
@@ -33,6 +34,12 @@ public class RankingFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if (savedInstanceState != null)
+        {
+            sortOrder = savedInstanceState.getInt(STATE_SORTORDER);
+
+        }
     }
 
     @Nullable
@@ -47,12 +54,12 @@ public class RankingFragment extends Fragment
         gridView.setOnItemClickListener(posterClickListener);
 
         repository = CachedRepository.getInstance(getActivity().getApplicationContext());
-        repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback);
+        repository.loadMovies(sortOrder != SORTORDER_INVALID ? sortOrder : SORTORDER_POPULAR, moviesLoadedCallback);
 
         return view;
     }
 
-    private AdapterView.OnItemClickListener posterClickListener=new AdapterView.OnItemClickListener()
+    private AdapterView.OnItemClickListener posterClickListener = new AdapterView.OnItemClickListener()
     {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -137,5 +144,11 @@ public class RankingFragment extends Fragment
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        outState.putInt(STATE_SORTORDER, sortOrder);
     }
 }

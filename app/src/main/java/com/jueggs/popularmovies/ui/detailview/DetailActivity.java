@@ -1,6 +1,7 @@
 package com.jueggs.popularmovies.ui.detailview;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.model.Movie;
@@ -17,14 +18,18 @@ public class DetailActivity extends AppCompatActivity
 
         setTitle(String.format(getString(R.string.format_title), getString(R.string.title_detail)));
 
-        Bundle extras = getIntent().getExtras();
-
-        if (extras != null)
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+        if (fragment == null)
         {
-            Movie movie = extras.getParcelable(EXTRA_MOVIE);
-            if (movie != null)
+            Bundle extras = getIntent().getExtras();
+
+            if (extras != null)
             {
-                getSupportFragmentManager().beginTransaction().add(R.id.container, DetailFragment.createInstance(movie)).commit();
+                Movie movie = extras.getParcelable(EXTRA_MOVIE);
+                if (movie != null)
+                {
+                    getSupportFragmentManager().beginTransaction().add(R.id.container, DetailFragment.createInstance(movie)).commit();
+                }
             }
         }
     }

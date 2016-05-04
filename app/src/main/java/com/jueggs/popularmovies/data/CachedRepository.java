@@ -68,7 +68,12 @@ public class CachedRepository
 
     public void clear(int sortOrder)
     {
-        movieLists.get(sortOrder).clear();
+        List<Movie> list = movieLists.get(sortOrder);
+
+        if (list != null)
+        {
+            list.clear();
+        }
     }
 
     public boolean isExpired()
