@@ -13,12 +13,12 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import static com.jueggs.popularmovies.data.MovieContract.BASE_URL_IMAGES;
-import static com.jueggs.popularmovies.data.MovieContract.IMG_WIDTH_185;
+import static com.jueggs.popularmovies.data.MovieDbContract.BASE_URL_IMAGES;
+import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 
-public class MoviesAdapter extends ArrayAdapter<Movie>
+public class RankingAdapter extends ArrayAdapter<Movie>
 {
-    public MoviesAdapter(Context context, int resource, List<Movie> objects)
+    public RankingAdapter(Context context, int resource, List<Movie> objects)
     {
         super(context, 0, objects);
     }

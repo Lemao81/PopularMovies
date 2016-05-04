@@ -10,7 +10,7 @@ import com.jueggs.popularmovies.util.NetUtils;
 
 import java.util.List;
 
-import static com.jueggs.popularmovies.data.MovieContract.*;
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 
 public class FetchService
 {

@@ -10,7 +10,7 @@ import com.jueggs.popularmovies.util.Utils;
 import java.util.Date;
 import java.util.List;
 
-import static com.jueggs.popularmovies.data.MovieContract.*;
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 
 public class CachedRepository
 {

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static com.jueggs.popularmovies.data.MovieContract.*;
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 
 public class IOUtils
 {

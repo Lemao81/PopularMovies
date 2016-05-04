@@ -3,5 +3,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.jueggs.popularmovies.ui.mainview.MoviesFragment"
+    android:name="com.jueggs.popularmovies.ui.mainview.RankingFragment"
     tools:layout="@layout/fragment_main" />

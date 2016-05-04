@@ -6,7 +6,7 @@ import com.jueggs.popularmovies.model.Movie;
 
 import java.util.List;
 
-public class MovieContract
+public class MovieDbContract
 {
     public static final int SORTORDER_INVALID = -1;
     public static final int SORTORDER_POPULAR = 1;

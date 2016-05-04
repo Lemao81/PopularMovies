@@ -1,27 +1,30 @@
 package com.jueggs.popularmovies.ui.mainview;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.CachedRepository;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.ui.detailview.DetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jueggs.popularmovies.data.MovieContract.*;
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 
 
-public class MoviesFragment extends Fragment
+public class RankingFragment extends Fragment
 {
-    public static final String TAG = MoviesFragment.class.getSimpleName();
+    public static final String TAG = RankingFragment.class.getSimpleName();
 
-    private MoviesAdapter moviesAdapter;
+    private RankingAdapter rankingAdapter;
     private CachedRepository repository;
     private int sortOrder = SORTORDER_INVALID;
 
@@ -39,14 +42,28 @@ public class MoviesFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         GridView gridView = (GridView) view.findViewById(R.id.gridView);
-        moviesAdapter = new MoviesAdapter(getContext(), 0, new ArrayList<Movie>());
-        gridView.setAdapter(moviesAdapter);
+        rankingAdapter = new RankingAdapter(getContext(), 0, new ArrayList<Movie>());
+        gridView.setAdapter(rankingAdapter);
+        gridView.setOnItemClickListener(posterClickListener);
 
         repository = CachedRepository.getInstance(getActivity().getApplicationContext());
         repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback);
 
         return view;
     }
+
+    private AdapterView.OnItemClickListener posterClickListener=new AdapterView.OnItemClickListener()
+    {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Movie movie = rankingAdapter.getItem(position);
+
+            Intent intent = new Intent(getContext(), DetailActivity.class);
+            intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
+            startActivity(intent);
+        }
+    };
 
     private Callback moviesLoadedCallback = new Callback()
     {
@@ -76,10 +93,10 @@ public class MoviesFragment extends Fragment
 
     private void updateMovies(List<Movie> movies, int sortOrder)
     {
-        moviesAdapter.clear();
-        moviesAdapter.addAll(movies);
+        rankingAdapter.clear();
+        rankingAdapter.addAll(movies);
         setTitle(sortOrder);
-        MoviesFragment.this.sortOrder = sortOrder;
+        RankingFragment.this.sortOrder = sortOrder;
     }
 
     private void setTitle(int sortOrder)
@@ -90,7 +107,7 @@ public class MoviesFragment extends Fragment
 
     private void handleFailedMovieUpdate(String msg)
     {
-        MoviesFragment.this.sortOrder = SORTORDER_INVALID;
+        RankingFragment.this.sortOrder = SORTORDER_INVALID;
         Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
     }
 
