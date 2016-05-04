@@ -8,8 +8,10 @@ import java.util.List;
 
 public class MovieContract
 {
-    public static final int SORTORDER_POPULAR = 0;
-    public static final int SORTORDER_TOPRATED = 1;
+    public static final int SORTORDER_INVALID = -1;
+    public static final int SORTORDER_POPULAR = 1;
+    public static final int SORTORDER_TOPRATED = 2;
+    public static final int MASK_SORTORDER_VALID = SORTORDER_POPULAR | SORTORDER_TOPRATED;
     public static final int NUM_SORTORDER = 2;
 
     public static final int RC_OK_CACHE = 0;
@@ -53,6 +55,6 @@ public class MovieContract
 
     public interface Callback
     {
-        void onMoviesLoaded(int sortorder, int resultCode, List<Movie> movies);
+        void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies);
     }
 }

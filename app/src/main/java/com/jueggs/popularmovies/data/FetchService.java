@@ -19,17 +19,17 @@ public class FetchService
     private static FetchService instance;
 
     private Callback callback;
-    private int sortorder;
+    private int sortOrder;
 
     private FetchService()
     {
     }
 
-    public void fetchMovies(int sortorder, Callback callback)
+    public void fetchMovies(int sortOrder, Callback callback)
     {
         this.callback = callback;
-        this.sortorder = sortorder;
-        new FetchAsyncTask().execute(sortorder);
+        this.sortOrder = sortOrder;
+        new FetchAsyncTask().execute(sortOrder);
     }
 
     class FetchAsyncTask extends AsyncTask<Integer, Void, List<Movie>>
@@ -38,10 +38,10 @@ public class FetchService
         @Override
         protected List<Movie> doInBackground(Integer... params)
         {
-            int sortorder = params[0];
+            int sortOrder = params[0];
 
             Uri uri = Uri.parse(BASE_URL_MOVIES).buildUpon()
-                    .appendEncodedPath(PATHS.get(sortorder))
+                    .appendEncodedPath(PATHS.get(sortOrder))
                     .appendQueryParameter(QUERY_KEY_APIKEY, API_KEY).build();
 
             String jsonString = NetUtils.getData(uri);
@@ -62,12 +62,12 @@ public class FetchService
             {
                 if (movies != null)
                 {
-                    callback.onMoviesLoaded(sortorder, RC_OK_NETWORK, movies);
+                    callback.onMoviesLoaded(sortOrder, RC_OK_NETWORK, movies);
                 }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");
-                    callback.onMoviesLoaded(sortorder, RC_ERROR, null);
+                    callback.onMoviesLoaded(sortOrder, RC_ERROR, null);
                 }
             }
         }

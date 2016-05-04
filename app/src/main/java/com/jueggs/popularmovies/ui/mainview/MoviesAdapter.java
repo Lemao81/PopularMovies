@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies;
+package com.jueggs.popularmovies.ui.mainview;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.model.Movie;
 import com.squareup.picasso.Picasso;
 

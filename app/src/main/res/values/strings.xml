@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">PopularMovies</string>
+
+    <string name="format_title">Pop Movies - %s</string>
+    <string name="title">Pop Movies</string>
+    <string name="title_popular">Most popular</string>
+    <string name="title_toprated">Top rated</string>
+    <string name="title_detail">Details</string>
+
+    <string name="menu_popular">Most popular</string>
+    <string name="menu_toprated">Top rated</string>
+    <string name="menu_refresh">Refresh</string>
 </resources>

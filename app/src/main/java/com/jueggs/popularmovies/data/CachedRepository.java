@@ -30,24 +30,24 @@ public class CachedRepository
         this.context = context;
     }
 
-    public void loadMovies(int sortorder, Callback callback)
+    public void loadMovies(int sortOrder, Callback callback)
     {
-        List<Movie> movies = movieLists.get(sortorder);
+        List<Movie> movies = movieLists.get(sortOrder);
 
         if (!isExpired() && !isEmpty(movies))
         {
-            callback.onMoviesLoaded(sortorder, RC_OK_CACHE, movies);
+            callback.onMoviesLoaded(sortOrder, RC_OK_CACHE, movies);
         }
         else
         {
             if (NetUtils.isNetworkAvailable(context))
             {
                 this.callback = callback;
-                fetchService.fetchMovies(sortorder, moviesLoadedCallback);
+                fetchService.fetchMovies(sortOrder, moviesLoadedCallback);
             }
             else
             {
-                callback.onMoviesLoaded(sortorder, RC_NO_NETWORK, null);
+                callback.onMoviesLoaded(sortOrder, RC_NO_NETWORK, null);
             }
         }
     }
@@ -55,16 +55,21 @@ public class CachedRepository
     private Callback moviesLoadedCallback = new Callback()
     {
         @Override
-        public void onMoviesLoaded(int sortorder, int resultCode, List<Movie> movies)
+        public void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies)
         {
-            movieLists.put(sortorder, movies);
+            movieLists.put(sortOrder, movies);
             day = new Date();
             if (callback != null)
             {
-                callback.onMoviesLoaded(sortorder, resultCode, movies);
+                callback.onMoviesLoaded(sortOrder, resultCode, movies);
             }
         }
     };
+
+    public void clear(int sortOrder)
+    {
+        movieLists.get(sortOrder).clear();
+    }
 
     public boolean isExpired()
     {
