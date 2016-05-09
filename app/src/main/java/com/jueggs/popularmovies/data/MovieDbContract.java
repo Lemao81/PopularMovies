@@ -23,11 +23,13 @@ public class MovieDbContract
 
     public static final String BASE_URL_MOVIES = "http://api.themoviedb.org/3/movie";
     public static final String BASE_URL_IMAGES = "http://image.tmdb.org/t/p";
+    public static final String BASE_URL_YOUTUBE = "http://www.youtube.com/watch";
     public static final String PATH_POPULAR = "popular";
     public static final String PATH_TOPRATED = "top_rated";
     public static final String PATH_VIDEOS = "videos";
     public static final String PATH_REVIEWS = "reviews";
     public static final String QUERY_KEY_APIKEY = "api_key";
+    public static final String QUERY_KEY_YOUTUBE_VIDEO = "v";
 
     public static final int NUM_SORTORDER_PATHS = 2;
     public static final SparseArray<String> PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
@@ -86,6 +88,11 @@ public class MovieDbContract
     private static Uri appendApiKeyQuery(Uri.Builder builder)
     {
         return builder.appendQueryParameter(QUERY_KEY_APIKEY, BuildConfig.API_KEY).build();
+    }
+
+    public static Uri createYoutubeUri(String key)
+    {
+        return Uri.parse(BASE_URL_YOUTUBE).buildUpon().appendQueryParameter(QUERY_KEY_YOUTUBE_VIDEO, key).build();
     }
 
     public interface MovieLoadedCallback
