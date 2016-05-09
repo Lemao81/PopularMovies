@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.ui.mainview;
+package com.jueggs.popularmovies.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,10 +9,12 @@ import android.view.*;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.CachedRepository;
+import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.model.Movie;
-import com.jueggs.popularmovies.ui.detailview.DetailActivity;
+import com.jueggs.popularmovies.ui.detail.DetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +27,10 @@ public class RankingFragment extends Fragment
     public static final String TAG = RankingFragment.class.getSimpleName();
     public static final String STATE_SORTORDER = "STATE_SORTORDER";
 
+    @Bind(R.id.gridView) GridView gridView;
+
     private RankingAdapter rankingAdapter;
-    private CachedRepository repository;
+    private RankingRepository repository;
     private int sortOrder = SORTORDER_INVALID;
 
     @Override
@@ -47,13 +51,13 @@ public class RankingFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, view);
 
-        GridView gridView = (GridView) view.findViewById(R.id.gridView);
         rankingAdapter = new RankingAdapter(getContext(), 0, new ArrayList<Movie>());
         gridView.setAdapter(rankingAdapter);
         gridView.setOnItemClickListener(posterClickListener);
 
-        repository = CachedRepository.getInstance(getActivity().getApplicationContext());
+        repository = RankingRepository.getInstance(getActivity().getApplicationContext());
         repository.loadMovies(sortOrder != SORTORDER_INVALID ? sortOrder : SORTORDER_POPULAR, moviesLoadedCallback);
 
         return view;
@@ -72,7 +76,7 @@ public class RankingFragment extends Fragment
         }
     };
 
-    private Callback moviesLoadedCallback = new Callback()
+    private MovieLoadedCallback moviesLoadedCallback = new MovieLoadedCallback()
     {
         @Override
         public void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies)

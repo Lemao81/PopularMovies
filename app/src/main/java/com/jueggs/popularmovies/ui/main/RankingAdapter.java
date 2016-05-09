@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.ui.mainview;
+package com.jueggs.popularmovies.ui.main;
 
 import android.content.Context;
 import android.net.Uri;
@@ -13,8 +13,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import static com.jueggs.popularmovies.data.MovieDbContract.BASE_URL_IMAGES;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
+import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
 
 public class RankingAdapter extends ArrayAdapter<Movie>
 {
@@ -34,8 +34,8 @@ public class RankingAdapter extends ArrayAdapter<Movie>
         Movie movie = getItem(position);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.poster);
 
-        Uri uri = Uri.parse(BASE_URL_IMAGES).buildUpon().appendEncodedPath(IMG_WIDTH_185).appendEncodedPath(movie.getPosterPath()).build();
-        Picasso.with(getContext()).load(uri).into(imageView);
+        Uri uri = createImageUri(IMG_WIDTH_185, movie.getPosterPath());
+        Picasso.with(getContext()).load(uri).placeholder(R.drawable.picasso_placeholder).error(R.drawable.picasso_error).into(imageView);
 
         return convertView;
     }

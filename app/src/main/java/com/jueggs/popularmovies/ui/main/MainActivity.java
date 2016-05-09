@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.ui.mainview;
+package com.jueggs.popularmovies.ui.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

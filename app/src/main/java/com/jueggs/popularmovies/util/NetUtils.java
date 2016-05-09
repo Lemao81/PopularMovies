@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
+import com.facebook.stetho.urlconnection.StethoURLConnectionManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,17 +16,25 @@ public class NetUtils
 {
     public static final String TAG = NetUtils.class.getSimpleName();
 
-    public static String getData(Uri uri)
+    public static String getJsonData(Uri uri)
     {
         String result = null;
         HttpURLConnection connection = null;
+        StethoURLConnectionManager stethoManager = new StethoURLConnectionManager(StethoURLConnectionManager.class.getSimpleName());
+
         try
         {
             URL url = new URL(uri.toString());
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            stethoManager.preConnect(connection, null);
+            connection.connect();
+            stethoManager.postConnect();
+
             InputStream is = connection.getInputStream();
+            is = stethoManager.interpretResponseStream(is);
+
             result = IOUtils.readStream(is);
         }
         catch (IOException e)

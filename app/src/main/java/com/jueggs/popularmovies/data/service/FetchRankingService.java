@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.data;
+package com.jueggs.popularmovies.data.service;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,22 +10,25 @@ import com.jueggs.popularmovies.util.NetUtils;
 
 import java.util.List;
 
+import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
+import static com.jueggs.popularmovies.util.IOUtils.*;
+import static com.jueggs.popularmovies.util.NetUtils.*;
 
-public class FetchService
+public class FetchRankingService
 {
-    public static final String TAG = FetchService.class.getSimpleName();
+    public static final String TAG = FetchRankingService.class.getSimpleName();
 
-    private static FetchService instance;
+    private static FetchRankingService instance;
 
-    private Callback callback;
+    private MovieLoadedCallback callback;
     private int sortOrder;
 
-    private FetchService()
+    private FetchRankingService()
     {
     }
 
-    public void fetchMovies(int sortOrder, Callback callback)
+    public void fetchMovies(int sortOrder, MovieLoadedCallback callback)
     {
         this.callback = callback;
         this.sortOrder = sortOrder;
@@ -38,28 +41,21 @@ public class FetchService
         @Override
         protected List<Movie> doInBackground(Integer... params)
         {
-            int sortOrder = params[0];
+            String jsonString = getJsonData(createRankingUri(params[0]));
 
-            Uri uri = Uri.parse(BASE_URL_MOVIES).buildUpon()
-                    .appendEncodedPath(PATHS.get(sortOrder))
-                    .appendQueryParameter(QUERY_KEY_APIKEY, API_KEY).build();
-
-            String jsonString = NetUtils.getData(uri);
-
-            if (TextUtils.isEmpty(jsonString))
+            if (isEmpty(jsonString))
             {
                 Log.e(TAG, "no useful json string retrieved");
                 return null;
             }
 
-            return IOUtils.getMovieListFromJSON(jsonString);
+            return getMovieListFromJSON(jsonString);
         }
 
         @Override
         protected void onPostExecute(List<Movie> movies)
         {
             if (callback != null)
-            {
                 if (movies != null)
                 {
                     callback.onMoviesLoaded(sortOrder, RC_OK_NETWORK, movies);
@@ -69,16 +65,15 @@ public class FetchService
                     Log.e(TAG, "something went wrong during fetching, returned null");
                     callback.onMoviesLoaded(sortOrder, RC_ERROR, null);
                 }
-            }
         }
 
     }
 
-    public static FetchService getInstance()
+    public static FetchRankingService getInstance()
     {
         if (instance == null)
         {
-            instance = new FetchService();
+            instance = new FetchRankingService();
         }
         return instance;
     }

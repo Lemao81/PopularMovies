@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class Movie implements Parcelable
 {
+    private int id;
     private String title;
     private Date releaseDate;
     private String posterPath;
@@ -19,6 +20,7 @@ public class Movie implements Parcelable
 
     protected Movie(Parcel in)
     {
+        id = in.readInt();
         title = in.readString();
         releaseDate = (Date) in.readSerializable();
         posterPath = in.readString();
@@ -35,6 +37,7 @@ public class Movie implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
+        dest.writeInt(id);
         dest.writeString(title);
         dest.writeSerializable(releaseDate);
         dest.writeString(posterPath);
@@ -56,6 +59,16 @@ public class Movie implements Parcelable
             return new Movie[size];
         }
     };
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
 
     public String getOverview()
     {
