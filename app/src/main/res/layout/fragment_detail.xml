@@ -87,17 +87,13 @@
                 android:layout_marginTop="@dimen/space_large"
                 tools:text="@string/details_overview_placeholder" />
 
-            <View
+            <LinearLayout
+                android:id="@+id/trailerReviewContainer"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_marginTop="@dimen/space_large"
-                android:background="@android:color/black"
-                android:layout_height="1dp" />
+                android:layout_height="wrap_content">
 
-            <ListView
-                android:id="@+id/trailerList"
-                android:layout_marginTop="@dimen/space_large"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

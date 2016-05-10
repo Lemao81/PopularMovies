@@ -83,12 +83,10 @@ public class RankingFragment extends Fragment
         {
             switch (resultCode)
             {
+                case RC_OK_NETWORK:
+                    Toast.makeText(getContext(), "Updated movie list", Toast.LENGTH_SHORT).show();
                 case RC_OK_CACHE:
                     updateMovies(movies, sortOrder);
-                    break;
-                case RC_OK_NETWORK:
-                    updateMovies(movies, sortOrder);
-                    Toast.makeText(getContext(), "Updated movie list", Toast.LENGTH_LONG).show();
                     break;
                 case RC_NO_NETWORK:
                     handleFailedMovieUpdate("No network available :(");

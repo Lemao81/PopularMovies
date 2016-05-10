@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:text="Trailers:"
+    tools:text="Reviews:"
     android:id="@+id/header"
-    android:text="@string/trailer_header"
+    android:text="@string/review_header"
     style="@style/detail_lists_header"/>

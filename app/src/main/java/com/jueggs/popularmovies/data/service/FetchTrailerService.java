@@ -5,13 +5,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Trailer;
-import com.jueggs.popularmovies.util.IOUtils;
-import com.jueggs.popularmovies.util.NetUtils;
 
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.IOUtils.*;
+import static com.jueggs.popularmovies.util.ParseUtils.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
 
 public class FetchTrailerService

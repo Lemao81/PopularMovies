@@ -8,20 +8,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.R;
+import com.jueggs.popularmovies.data.repo.ReviewRepository;
 import com.jueggs.popularmovies.data.repo.TrailerRepository;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
@@ -39,9 +37,12 @@ public class DetailFragment extends Fragment
     @Bind(R.id.release_date) TextView releaseDate;
     @Bind(R.id.vote_average) TextView voteAverage;
     @Bind(R.id.overview) TextView overview;
-    @Bind(R.id.trailerList) ListView trailerList;
+    @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
 
-    private TrailerAdapter trailerAdapter;
+    private List<Trailer> trailers;
+    private List<Review> reviews;
+    private boolean trailerLoaded;
+    private boolean reviewLoaded;
 
     public static DetailFragment createInstance(Movie movie)
     {
@@ -68,11 +69,8 @@ public class DetailFragment extends Fragment
 
         bindView(movie);
 
-        trailerAdapter = new TrailerAdapter(getContext(), 0, new ArrayList<Trailer>());
-        trailerList.setAdapter(trailerAdapter);
-//        trailerList.addHeaderView(inflater.inflate(R.layout.trailerlist_header, container, false));
-
         TrailerRepository.getInstance(getContext()).loadTrailers(movie.getId(), trailerLoadedCallback);
+        ReviewRepository.getInstance(getContext()).loadReviews(movie.getId(), reviewLoadedCallback);
 
         return view;
     }
@@ -86,25 +84,28 @@ public class DetailFragment extends Fragment
         overview.setText(movie.getOverview());
     }
 
-    private TrailerLoadedCallback trailerLoadedCallback=new TrailerLoadedCallback()
+    private TrailerLoadedCallback trailerLoadedCallback = new TrailerLoadedCallback()
     {
         @Override
         public void onTrailerLoaded(List<Trailer> trailers, int resultCode)
         {
+            DetailFragment.this.trailers = trailers;
+            trailerLoaded = true;
+
             switch (resultCode)
             {
-                case RC_OK_CACHE:
-                    updateTrailers(trailers);
-                    break;
                 case RC_OK_NETWORK:
-                    updateTrailers(trailers);
-                    Toast.makeText(getContext(), "Updated trailer list", Toast.LENGTH_LONG).show();
+                    if(reviewLoaded)
+                        Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
+                case RC_OK_CACHE:
+                    if (reviewLoaded)
+                        updateTrailerAndReview();
                     break;
                 case RC_NO_NETWORK:
-                    handleFailedTrailerUpdate("No network available :(");
+                    handleFailedUpdate("No network available :(");
                     break;
                 case RC_ERROR:
-                    handleFailedTrailerUpdate("An inexplicable error occurred during network access");
+                    handleFailedUpdate("An inexplicable error occurred during network access to fetch trailer");
                     break;
                 default:
                     Log.e(TAG, "unknown result code");
@@ -112,13 +113,41 @@ public class DetailFragment extends Fragment
         }
     };
 
-    private void updateTrailers(List<Trailer> trailers)
+    private ReviewLoadedCallback reviewLoadedCallback = new ReviewLoadedCallback()
     {
-        trailerAdapter.clear();
-        trailerAdapter.addAll(trailers);
+        @Override
+        public void onReviewLoaded(List<Review> reviews, int resultCode)
+        {
+            DetailFragment.this.reviews = reviews;
+            reviewLoaded = true;
+
+            switch (resultCode)
+            {
+                case RC_OK_NETWORK:
+                    if(trailerLoaded)
+                        Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
+                case RC_OK_CACHE:
+                    if (trailerLoaded)
+                        updateTrailerAndReview();
+                    break;
+                case RC_NO_NETWORK:
+                    break;
+                case RC_ERROR:
+                    handleFailedUpdate("An inexplicable error occurred during network access to fetch reviews");
+                    break;
+                default:
+                    Log.e(TAG, "unknown result code");
+            }
+        }
+    };
+
+    private void updateTrailerAndReview()
+    {
+        DetailAdapter adapter = new DetailAdapter(trailerReviewContainer, getContext(), trailers, reviews);
+        adapter.createViews();
     }
 
-    private void handleFailedTrailerUpdate(String message)
+    private void handleFailedUpdate(String message)
     {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }

@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.util.SparseArray;
 import com.jueggs.popularmovies.BuildConfig;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
 
 import java.util.List;
@@ -48,6 +49,8 @@ public class MovieDbContract
     public static final String PROP_KEY = "key";
     public static final String PROP_NAME = "name";
     public static final String PROP_SIZE = "size";
+    public static final String PROP_AUTHOR = "author";
+    public static final String PROP_CONTENT = "content";
 
     public static final String IMG_WIDTH_92 = "w92";
     public static final String IMG_WIDTH_154 = "w154";
@@ -103,5 +106,10 @@ public class MovieDbContract
     public interface TrailerLoadedCallback
     {
         void onTrailerLoaded(List<Trailer> trailers, int resultCode);
+    }
+
+    public interface ReviewLoadedCallback
+    {
+        void onReviewLoaded(List<Review> reviews, int resultCode);
     }
 }
