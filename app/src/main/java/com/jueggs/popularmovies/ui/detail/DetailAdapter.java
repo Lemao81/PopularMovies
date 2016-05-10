@@ -23,6 +23,7 @@ public class DetailAdapter
     private List<Review> reviews;
     private ViewGroup container;
     private Context context;
+    private LayoutInflater inflater;
 
     public DetailAdapter(ViewGroup container, Context context, List<Trailer> trailers, List<Review> reviews)
     {
@@ -34,69 +35,76 @@ public class DetailAdapter
 
     public void createViews()
     {
-        LayoutInflater inflater = null;
         container.removeAllViews();
-        if (!isEmpty(trailers))
-        {
-            inflater = LayoutInflater.from(context);
-            container.addView(inflater.inflate(R.layout.distinct_divider, container, false));
-            container.addView(inflater.inflate(R.layout.trailerlist_header, container, false));
 
-            int size = trailers.size();
-            for (int i = 0; i < size; i++)
-            {
-                View view = inflater.inflate(R.layout.listitem_trailer, container, false);
-                bindTrailerView(view, trailers.get(i));
-                container.addView(view);
-                if (i < size - 1)
-                    container.addView(inflater.inflate(R.layout.vague_divider, container, false));
-            }
-        }
-
-        if (!isEmpty(reviews))
-        {
-            if (inflater == null)
-                inflater = LayoutInflater.from(context);
-
-            container.addView(inflater.inflate(R.layout.distinct_divider, container, false));
-            container.addView(inflater.inflate(R.layout.reviewlist_header, container, false));
-
-            int size = reviews.size();
-            for (int i = 0; i < size; i++)
-            {
-                View view = inflater.inflate(R.layout.listitem_review, container, false);
-                bindReviewView(view, reviews.get(i));
-                container.addView(view);
-                if (i < size - 1)
-                    container.addView(inflater.inflate(R.layout.vague_divider, container, false));
-            }
-        }
-    }
-
-    private void bindTrailerView(View view, Trailer trailer)
-    {
-        view.findViewById(R.id.play).setOnClickListener(createOnClickListener(trailer.getKey()));
-        ((TextView) view.findViewById(R.id.name)).setText(trailer.getName());
-        ((TextView) view.findViewById(R.id.size)).setText(String.format(context.getString(R.string.format_trailer_size), trailer.getSize()));
-        String language = new Locale(trailer.getLanguage(), trailer.getRegion()).getDisplayName();
-        ((TextView) view.findViewById(R.id.language)).setText(language);
-    }
-
-    private View.OnClickListener createOnClickListener(final String key)
-    {
-        return new View.OnClickListener()
+        new ListCreator<Trailer>(trailers, R.layout.trailerlist_header, R.layout.listitem_trailer)
         {
             @Override
-            public void onClick(View v)
+            void bindView(View view, final Trailer trailer)
             {
-                context.startActivity(new Intent(Intent.ACTION_VIEW).setData(MovieDbContract.createYoutubeUri(key)));
+                view.findViewById(R.id.play).setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        context.startActivity(new Intent(Intent.ACTION_VIEW).setData(MovieDbContract.createYoutubeUri(trailer.getKey())));
+                    }
+                });
+                ((TextView) view.findViewById(R.id.name)).setText(trailer.getName());
+                String size = String.format(context.getString(R.string.format_trailer_size), trailer.getSize());
+                ((TextView) view.findViewById(R.id.size)).setText(size);
+                String language = new Locale(trailer.getLanguage(), trailer.getRegion()).getDisplayName();
+                ((TextView) view.findViewById(R.id.language)).setText(language);
             }
-        };
+        }.createList();
+
+        new ListCreator<Review>(reviews, R.layout.reviewlist_header, R.layout.listitem_review)
+        {
+            @Override
+            void bindView(View view, Review review)
+            {
+                String author = String.format(context.getString(R.string.format_review_author), review.getAuthor());
+                ((TextView) view.findViewById(R.id.author)).setText(author);
+                ((TextView) view.findViewById(R.id.review)).setText(review.getReview());
+            }
+        }.createList();
     }
 
-    private void bindReviewView(View view, Review review)
+    abstract class ListCreator<T>
     {
-        ((TextView) view.findViewById(R.id.author)).setText(String.format(context.getString(R.string.format_review_author), review.getAuthor()));
-        ((TextView) view.findViewById(R.id.review)).setText(review.getReview());
+        private List<T> items;
+        private int resHeaderId;
+        private int resItemId;
+
+        abstract void bindView(View view, T item);
+
+        public ListCreator(List<T> items, int resHeaderId, int resItemId)
+        {
+            this.items = items;
+            this.resHeaderId = resHeaderId;
+            this.resItemId = resItemId;
+        }
+
+        public void createList()
+        {
+            if (!isEmpty(items))
+            {
+                if (inflater == null)
+                    inflater = LayoutInflater.from(context);
+
+                container.addView(inflater.inflate(R.layout.distinct_divider, container, false));
+                container.addView(inflater.inflate(resHeaderId, container, false));
+
+                int size = items.size();
+                for (int i = 0; i < size; i++)
+                {
+                    View view = inflater.inflate(resItemId, container, false);
+                    bindView(view, items.get(i));
+                    container.addView(view);
+                    if (i < size - 1)
+                        container.addView(inflater.inflate(R.layout.vague_divider, container, false));
+                }
+            }
+        }
     }
 }
