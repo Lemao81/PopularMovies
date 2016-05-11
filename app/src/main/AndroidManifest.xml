@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.detail.DetailActivity" />
+
+        <provider
+            android:authorities="com.jueggs.popularmovies"
+            android:name=".data.favourites.schematic.generated.FavouritesProvider" />
     </application>
 
 </manifest>

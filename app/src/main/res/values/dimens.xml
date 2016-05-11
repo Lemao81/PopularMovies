@@ -13,4 +13,6 @@
     <dimen name="details_title_textsize">25sp</dimen>
     <dimen name="details_releasedate_textsize">18sp</dimen>
     <dimen name="details_voteaverage_textsize">16sp</dimen>
+
+    <dimen name="details_star_size">48dp</dimen>
 </resources>

@@ -1,5 +1,6 @@
 package com.jueggs.popularmovies.ui.detail;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.R;
+import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 import com.jueggs.popularmovies.data.repo.ReviewRepository;
 import com.jueggs.popularmovies.data.repo.TrailerRepository;
 import com.jueggs.popularmovies.model.Movie;
@@ -25,6 +27,7 @@ import java.util.List;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
+import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
 
 public class DetailFragment extends Fragment
 {
@@ -40,10 +43,14 @@ public class DetailFragment extends Fragment
     @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
     @Bind(R.id.favourite) ImageButton favourite;
 
+    private Movie movie;
     private List<Trailer> trailers;
     private List<Review> reviews;
     private boolean trailerLoaded;
     private boolean reviewLoaded;
+    private boolean isFavourite;
+    private Uri favouriteIdUri;
+    private ContentResolver contentResolver;
 
     public static DetailFragment createInstance(Movie movie)
     {
@@ -61,12 +68,15 @@ public class DetailFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
 
-        Movie movie = getArguments().getParcelable(ARG_MOVIE);
+        movie = getArguments().getParcelable(ARG_MOVIE);
         if (movie == null)
             getActivity().finish();
 
         Uri uri = createImageUri(IMG_WIDTH_185, movie.getPosterPath());
         Picasso.with(getContext()).load(uri).placeholder(R.drawable.picasso_placeholder).error(R.drawable.picasso_error).into(thumbnail);
+
+        favouriteIdUri = Favourite.withMovieId(movie.getMovieId());
+        contentResolver = getContext().getContentResolver();
 
         bindView(movie);
 
@@ -83,6 +93,36 @@ public class DetailFragment extends Fragment
         releaseDate.setText(dateFormat.format(movie.getReleaseDate()));
         voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
         overview.setText(movie.getOverview());
+
+        isFavourite = contentResolver.query(favouriteIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
+        changeStarDrawable(isFavourite);
+        favourite.setOnClickListener(addFavouriteClickListener);
+    }
+
+    private View.OnClickListener addFavouriteClickListener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View v)
+        {
+            if (isFavourite)
+            {
+                contentResolver.delete(favouriteIdUri, null, null);
+                changeStarDrawable(false);
+                Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                contentResolver.insert(Favourite.BASE_URI, movie.toContentValues());
+                changeStarDrawable(true);
+                isFavourite = true;
+                Toast.makeText(getContext(), R.string.favourites_added_msg, Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    private void changeStarDrawable(boolean checked)
+    {
+        favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
     }
 
     private TrailerLoadedCallback trailerLoadedCallback = new TrailerLoadedCallback()
@@ -96,7 +136,7 @@ public class DetailFragment extends Fragment
             switch (resultCode)
             {
                 case RC_OK_NETWORK:
-                    if(reviewLoaded)
+                    if (reviewLoaded)
                         Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
                 case RC_OK_CACHE:
                     if (reviewLoaded)
@@ -125,7 +165,7 @@ public class DetailFragment extends Fragment
             switch (resultCode)
             {
                 case RC_OK_NETWORK:
-                    if(trailerLoaded)
+                    if (trailerLoaded)
                         Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
                 case RC_OK_CACHE:
                     if (trailerLoaded)

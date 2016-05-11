@@ -1,12 +1,17 @@
 package com.jueggs.popularmovies.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 
 import java.util.Date;
 
 public class Movie implements Parcelable
 {
+    public static final int ENCODE_BIT_SHIFT = 16;
+    public static final int MAX_GENRE_IDS = 4;
+
     private int dbId;
     private int movieId;
     private String title;
@@ -55,7 +60,7 @@ public class Movie implements Parcelable
         dest.writeFloat(voteAverage);
         dest.writeString(overview);
         dest.writeIntArray(genreIds);
-        dest.writeByte((byte)(adult ? 1 : 0));
+        dest.writeByte((byte) (adult ? 1 : 0));
         dest.writeString(originalTitle);
         dest.writeString(originalLanguage);
     }
@@ -165,6 +170,32 @@ public class Movie implements Parcelable
         this.genreIds = genreIds;
     }
 
+    //save up to 4 genre ids as 16 bit chunks in a long value
+    public long encodeGenreIds()
+    {
+        long encoded = 0;
+
+        for (int i = MAX_GENRE_IDS - 1; i >= 0; i--)
+        {
+            int shift = i * ENCODE_BIT_SHIFT;
+            int id = getGenreIds()[i];
+            encoded = ((encoded >> shift) | (0xffff & id)) << shift;
+        }
+        return encoded;
+    }
+
+    public int[] decodeGenreIds(long encoded)
+    {
+        int[] ids = new int[MAX_GENRE_IDS];
+
+        for (int i = 0; i < MAX_GENRE_IDS; i++)
+        {
+            int shift = i * ENCODE_BIT_SHIFT;
+            ids[i] = (int) ((encoded >> shift) & 0xffff);
+        }
+        return ids;
+    }
+
     public String getOriginalLanguage()
     {
         return originalLanguage;
@@ -183,5 +214,21 @@ public class Movie implements Parcelable
     public void setOriginalTitle(String originalTitle)
     {
         this.originalTitle = originalTitle;
+    }
+
+    public ContentValues toContentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(FavouriteColumns.ADULT, isAdult());
+        values.put(FavouriteColumns.GENRE_IDS, encodeGenreIds());
+        values.put(FavouriteColumns.MOVIE_ID, getMovieId());
+        values.put(FavouriteColumns.ORIG_LANG, getOriginalLanguage());
+        values.put(FavouriteColumns.ORIG_TITLE, getOriginalTitle());
+        values.put(FavouriteColumns.OVERVIEW, getOverview());
+        values.put(FavouriteColumns.POSTER_PATH, getPosterPath());
+        values.put(FavouriteColumns.TITLE, getTitle());
+        values.put(FavouriteColumns.REL_DATE, getReleaseDate().getTime());
+        values.put(FavouriteColumns.VOTE_AVERAGE, getVoteAverage());
+        return values;
     }
 }

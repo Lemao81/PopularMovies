@@ -12,6 +12,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,7 +44,8 @@ public class ParseUtils
                 movie.setPosterPath(item.getString(PROP_POSTERPATH));
                 movie.setVoteAverage((float) item.getDouble(PROP_VOTEAVERAGE));
                 movie.setReleaseDate(dateFormat.parse(item.getString(PROP_RELEASEDATE)));
-                movie.setGenreIds(toIntArray(genreIds));
+                int[] unaligned = toIntArray(genreIds);
+                movie.setGenreIds(Arrays.copyOf(unaligned, 4));
                 movie.setAdult(item.getBoolean(PROP_ADULT));
                 movie.setOriginalTitle(item.getString(PROP_ORIG_TITLE));
                 movie.setOriginalLanguage(item.getString(PROP_ORIG_LANG));
