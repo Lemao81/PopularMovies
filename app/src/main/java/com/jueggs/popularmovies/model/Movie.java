@@ -7,12 +7,17 @@ import java.util.Date;
 
 public class Movie implements Parcelable
 {
-    private int id;
+    private int dbId;
+    private int movieId;
     private String title;
     private Date releaseDate;
     private String posterPath;
     private float voteAverage;
     private String overview;
+    private int[] genreIds;
+    private boolean adult;
+    private String originalTitle;
+    private String originalLanguage;
 
     public Movie()
     {
@@ -20,12 +25,17 @@ public class Movie implements Parcelable
 
     protected Movie(Parcel in)
     {
-        id = in.readInt();
+        dbId = in.readInt();
+        movieId = in.readInt();
         title = in.readString();
         releaseDate = (Date) in.readSerializable();
         posterPath = in.readString();
         voteAverage = in.readFloat();
         overview = in.readString();
+        genreIds = in.createIntArray();
+        adult = in.readByte() != 0;
+        originalTitle = in.readString();
+        originalLanguage = in.readString();
     }
 
     @Override
@@ -37,12 +47,17 @@ public class Movie implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeInt(id);
+        dest.writeInt(dbId);
+        dest.writeInt(movieId);
         dest.writeString(title);
         dest.writeSerializable(releaseDate);
         dest.writeString(posterPath);
         dest.writeFloat(voteAverage);
         dest.writeString(overview);
+        dest.writeIntArray(genreIds);
+        dest.writeByte((byte)(adult ? 1 : 0));
+        dest.writeString(originalTitle);
+        dest.writeString(originalLanguage);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>()
@@ -60,14 +75,24 @@ public class Movie implements Parcelable
         }
     };
 
-    public int getId()
+    public int getDbId()
     {
-        return id;
+        return dbId;
     }
 
-    public void setId(int id)
+    public void setDbId(int dbId)
     {
-        this.id = id;
+        this.dbId = dbId;
+    }
+
+    public int getMovieId()
+    {
+        return movieId;
+    }
+
+    public void setMovieId(int movieId)
+    {
+        this.movieId = movieId;
     }
 
     public String getOverview()
@@ -118,5 +143,45 @@ public class Movie implements Parcelable
     public void setVoteAverage(float voteAverage)
     {
         this.voteAverage = voteAverage;
+    }
+
+    public boolean isAdult()
+    {
+        return adult;
+    }
+
+    public void setAdult(boolean adult)
+    {
+        this.adult = adult;
+    }
+
+    public int[] getGenreIds()
+    {
+        return genreIds;
+    }
+
+    public void setGenreIds(int[] genreIds)
+    {
+        this.genreIds = genreIds;
+    }
+
+    public String getOriginalLanguage()
+    {
+        return originalLanguage;
+    }
+
+    public void setOriginalLanguage(String originalLanguage)
+    {
+        this.originalLanguage = originalLanguage;
+    }
+
+    public String getOriginalTitle()
+    {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle)
+    {
+        this.originalTitle = originalTitle;
     }
 }

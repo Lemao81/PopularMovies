@@ -25,6 +25,7 @@ public class ParseUtils
     {
         DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
         List<Movie> movies = new ArrayList<>();
+
         try
         {
             JSONObject root = new JSONObject(jsonString);
@@ -32,31 +33,40 @@ public class ParseUtils
 
             for (int i = 0; i < results.length(); i++)
             {
-                JSONObject item = (JSONObject) results.get(i);
-
                 Movie movie = new Movie();
-                movie.setId(item.getInt(PROP_ID));
+                JSONObject item = (JSONObject) results.get(i);
+                JSONArray genreIds = item.getJSONArray(PROP_GENRE_IDS);
+
+                movie.setMovieId(item.getInt(PROP_ID));
                 movie.setTitle(item.getString(PROP_TITLE));
                 movie.setOverview(item.getString(PROP_OVERVIEW));
                 movie.setPosterPath(item.getString(PROP_POSTERPATH));
-                try
-                {
-                    movie.setReleaseDate(dateFormat.parse(item.getString(PROP_RELEASEDATE)));
-                }
-                catch (ParseException e)
-                {
-                    Log.e(TAG, e.getMessage());
-                }
                 movie.setVoteAverage((float) item.getDouble(PROP_VOTEAVERAGE));
+                movie.setReleaseDate(dateFormat.parse(item.getString(PROP_RELEASEDATE)));
+                movie.setGenreIds(toIntArray(genreIds));
+                movie.setAdult(item.getBoolean(PROP_ADULT));
+                movie.setOriginalTitle(item.getString(PROP_ORIG_TITLE));
+                movie.setOriginalLanguage(item.getString(PROP_ORIG_LANG));
 
                 movies.add(movie);
             }
         }
-        catch (JSONException e)
+        catch (JSONException | ParseException e)
         {
             Log.e(TAG, e.getMessage());
         }
         return movies;
+    }
+
+    public static int[] toIntArray(JSONArray jsonArray) throws JSONException
+    {
+        int length = jsonArray.length();
+        int[] ints = new int[length];
+        for (int i = 0; i < length; i++)
+        {
+            ints[i] = jsonArray.getInt(i);
+        }
+        return ints;
     }
 
     public static List<Trailer> getTrailerListFromJSON(String jsonString)

@@ -11,23 +11,21 @@
         android:layout_height="@dimen/details_title_height"
         android:background="@color/details_title_bg"
         android:gravity="center_vertical"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
         android:textSize="@dimen/details_title_textsize"
         android:textStyle="bold"
         tools:text="Chappie" />
 
     <ScrollView
-        tools:scrollY="500dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:scrollY="300dp"
             android:orientation="vertical"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -42,25 +40,24 @@
                 <com.jueggs.popularmovies.view.ThreeFourLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:paddingLeft="@dimen/space_normal"
-                    android:paddingRight="@dimen/space_normal"
-                    android:layout_weight="1">
+                    android:paddingRight="@dimen/space_normal">
 
                     <ImageView
                         android:id="@+id/thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
                         android:elevation="8dp"
+                        android:scaleType="centerCrop"
                         tools:src="@drawable/interstellar" />
                 </com.jueggs.popularmovies.view.ThreeFourLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.3"
-                    android:padding="@dimen/space_normal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_normal">
 
                     <TextView
                         android:id="@+id/release_date"
@@ -78,6 +75,20 @@
                         tools:text="8.1/10" />
                 </LinearLayout>
 
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8">
+
+                    <ImageButton
+                        android:id="@+id/favourite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_star_empty" />
+                </FrameLayout>
+
             </LinearLayout>
 
             <TextView
@@ -89,9 +100,9 @@
 
             <LinearLayout
                 android:id="@+id/trailerReviewContainer"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             </LinearLayout>
 

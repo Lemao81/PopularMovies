@@ -38,6 +38,7 @@ public class DetailFragment extends Fragment
     @Bind(R.id.vote_average) TextView voteAverage;
     @Bind(R.id.overview) TextView overview;
     @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
+    @Bind(R.id.favourite) ImageButton favourite;
 
     private List<Trailer> trailers;
     private List<Review> reviews;
@@ -69,8 +70,8 @@ public class DetailFragment extends Fragment
 
         bindView(movie);
 
-        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getId(), trailerLoadedCallback);
-        ReviewRepository.getInstance(getContext()).loadReviews(movie.getId(), reviewLoadedCallback);
+        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), trailerLoadedCallback);
+        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), reviewLoadedCallback);
 
         return view;
     }

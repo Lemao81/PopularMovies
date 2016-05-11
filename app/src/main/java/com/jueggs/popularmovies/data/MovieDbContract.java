@@ -51,6 +51,10 @@ public class MovieDbContract
     public static final String PROP_SIZE = "size";
     public static final String PROP_AUTHOR = "author";
     public static final String PROP_CONTENT = "content";
+    public static final String PROP_ADULT = "adult";
+    public static final String PROP_GENRE_IDS = "genre_ids";
+    public static final String PROP_ORIG_TITLE = "original_title";
+    public static final String PROP_ORIG_LANG = "original_language";
 
     public static final String IMG_WIDTH_92 = "w92";
     public static final String IMG_WIDTH_154 = "w154";

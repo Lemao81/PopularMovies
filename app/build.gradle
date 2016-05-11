@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
@@ -15,15 +16,28 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs{
+        release{
+            storeFile file(keystore_file)
+            storePassword keystore_password
+            keyAlias key_alias
+            keyPassword key_password
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     buildTypes.each{
             it.buildConfigField 'String', 'API_KEY', MovieDbApiKey
     }
+}
+
+ext{
+    simonvtSchematicVersion="0.6.7"
 }
 
 dependencies {
@@ -34,4 +48,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.stetho:stetho:1.3.1'
     compile 'com.facebook.stetho:stetho-urlconnection:1.3.1'
+    compile "net.simonvt.schematic:schematic:${simonvtSchematicVersion}"
+
+    apt "net.simonvt.schematic:schematic-compiler:${simonvtSchematicVersion}"
 }
