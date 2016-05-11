@@ -9,4 +9,8 @@
     <color name="black_transparent">#3000</color>
 
     <color name="dark_grey">#616161</color>
+
+    <color name="scrim">#55BDBDBD</color>
+
+    <color name="dark_scrim">#55424242</color>
 </resources>

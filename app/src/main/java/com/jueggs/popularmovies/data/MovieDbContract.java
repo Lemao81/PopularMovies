@@ -23,6 +23,7 @@ public class MovieDbContract
     public static final int RC_NO_NETWORK = 2;
     public static final int RC_ERROR = 3;
 
+    public static final String MOVIEDB_WEBSITE = "https://www.themoviedb.org/";
     public static final String BASE_URL_MOVIES = "http://api.themoviedb.org/3/movie";
     public static final String BASE_URL_IMAGES = "http://image.tmdb.org/t/p";
     public static final String BASE_URL_YOUTUBE = "http://www.youtube.com/watch";

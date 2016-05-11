@@ -37,7 +37,7 @@ public class RankingFragment extends Fragment
 
     private RankingAdapter rankingAdapter;
     private RankingRepository repository;
-    private int sortOrder = SORTORDER_INVALID;
+    private int sortOrder = SORTORDER_POPULAR;
     private SparseArray<String> titles = new SparseArray<>(NUM_SORTORDER);
 
     @Override
@@ -86,10 +86,7 @@ public class RankingFragment extends Fragment
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
             Movie movie = rankingAdapter.getItem(position);
-
-            Intent intent = new Intent(getContext(), DetailActivity.class);
-            intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
-            startActivity(intent);
+            ((Callback) getActivity()).onMovieSelected(movie);
         }
     };
 
@@ -175,5 +172,10 @@ public class RankingFragment extends Fragment
     public void onSaveInstanceState(Bundle outState)
     {
         outState.putInt(STATE_SORTORDER, sortOrder);
+    }
+
+    public interface Callback
+    {
+        void onMovieSelected(Movie movie);
     }
 }

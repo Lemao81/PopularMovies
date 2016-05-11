@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <com.jueggs.popularmovies.view.ForegroundImageView
         android:id="@+id/poster"
+        android:foreground="@drawable/grid_selector"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
 </com.jueggs.popularmovies.view.ThreeFourLayout>

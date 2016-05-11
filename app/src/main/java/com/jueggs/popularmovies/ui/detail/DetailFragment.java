@@ -29,7 +29,6 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
 import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
-import static com.jueggs.popularmovies.util.Utils.*;
 
 public class DetailFragment extends Fragment
 {
@@ -115,7 +114,7 @@ public class DetailFragment extends Fragment
             }
             else
             {
-                contentResolver.insert(Favourite.BASE_URI, transformMovieToContentValues(movie));
+                contentResolver.insert(Favourite.BASE_URI, Utils.transformMovieToContentValues(movie));
                 changeStarDrawable(true);
                 isFavourite = true;
                 Toast.makeText(getContext(), R.string.favourites_added_msg, Toast.LENGTH_LONG).show();
@@ -166,8 +165,6 @@ public class DetailFragment extends Fragment
             switch (resultCode)
             {
                 case RC_OK_NETWORK:
-                    if (trailerLoaded)
-                        Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
                 case RC_OK_CACHE:
                     if (trailerLoaded)
                         updateTrailerAndReview();
