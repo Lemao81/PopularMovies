@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+//not used
 public class DbHelper extends SQLiteOpenHelper
 {
     public static final String DB_NAME = "favourites.db";

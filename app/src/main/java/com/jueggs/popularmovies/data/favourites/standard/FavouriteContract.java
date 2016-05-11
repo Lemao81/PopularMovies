@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
 
 import java.util.Date;
 
+//not used
 public class FavouriteContract
 {
     public static final String AUTHORITY = "com.jueggs.popularmovies";

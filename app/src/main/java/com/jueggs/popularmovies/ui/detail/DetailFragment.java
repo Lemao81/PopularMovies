@@ -19,6 +19,7 @@ import com.jueggs.popularmovies.data.repo.TrailerRepository;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.util.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -28,6 +29,7 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
 import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
+import static com.jueggs.popularmovies.util.Utils.*;
 
 public class DetailFragment extends Fragment
 {
@@ -108,11 +110,12 @@ public class DetailFragment extends Fragment
             {
                 contentResolver.delete(favouriteIdUri, null, null);
                 changeStarDrawable(false);
+                isFavourite = false;
                 Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
             }
             else
             {
-                contentResolver.insert(Favourite.BASE_URI, movie.toContentValues());
+                contentResolver.insert(Favourite.BASE_URI, transformMovieToContentValues(movie));
                 changeStarDrawable(true);
                 isFavourite = true;
                 Toast.makeText(getContext(), R.string.favourites_added_msg, Toast.LENGTH_LONG).show();
@@ -136,8 +139,6 @@ public class DetailFragment extends Fragment
             switch (resultCode)
             {
                 case RC_OK_NETWORK:
-                    if (reviewLoaded)
-                        Toast.makeText(getContext(), "Updated trailer and reviews", Toast.LENGTH_SHORT).show();
                 case RC_OK_CACHE:
                     if (reviewLoaded)
                         updateTrailerAndReview();

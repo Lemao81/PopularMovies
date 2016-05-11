@@ -5,10 +5,12 @@
     <string name="title">Pop Movies</string>
     <string name="title_popular">Most popular</string>
     <string name="title_toprated">Top rated</string>
+    <string name="title_favourites">Favourites</string>
     <string name="title_detail">Details</string>
 
     <string name="menu_popular">Most popular</string>
     <string name="menu_toprated">Top rated</string>
+    <string name="menu_favourites">Favourites</string>
     <string name="menu_refresh">Refresh</string>
 
     <string name="format_vote_average"><xliff:g id="vote_average">%.1f/10</xliff:g></string>

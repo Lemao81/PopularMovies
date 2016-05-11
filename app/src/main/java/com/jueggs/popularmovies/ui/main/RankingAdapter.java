@@ -27,9 +27,7 @@ public class RankingAdapter extends ArrayAdapter<Movie>
     public View getView(int position, View convertView, ViewGroup parent)
     {
         if (convertView == null)
-        {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.griditem_movie, parent, false);
-        }
 
         Movie movie = getItem(position);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.poster);

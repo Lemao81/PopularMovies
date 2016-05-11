@@ -28,12 +28,18 @@ public class MovieTest
         Movie movie6 = createWithGenreIds(expected6);
 
         //Act
-        int[] actual1 = movie1.decodeGenreIds(movie1.encodeGenreIds());
-        int[] actual2 = movie2.decodeGenreIds(movie2.encodeGenreIds());
-        int[] actual3 = movie3.decodeGenreIds(movie3.encodeGenreIds());
-        int[] actual4 = movie4.decodeGenreIds(movie4.encodeGenreIds());
-        int[] actual5 = movie5.decodeGenreIds(movie5.encodeGenreIds());
-        int[] actual6 = movie6.decodeGenreIds(movie6.encodeGenreIds());
+        movie1.decodeGenreIds(movie1.encodeGenreIds());
+        movie2.decodeGenreIds(movie2.encodeGenreIds());
+        movie3.decodeGenreIds(movie3.encodeGenreIds());
+        movie4.decodeGenreIds(movie4.encodeGenreIds());
+        movie5.decodeGenreIds(movie5.encodeGenreIds());
+        movie6.decodeGenreIds(movie6.encodeGenreIds());
+        int[] actual1 = movie1.getGenreIds();
+        int[] actual2 = movie2.getGenreIds();
+        int[] actual3 = movie3.getGenreIds();
+        int[] actual4 = movie4.getGenreIds();
+        int[] actual5 = movie5.getGenreIds();
+        int[] actual6 = movie6.getGenreIds();
 
         //Assert
         assertArrayEquals(expected1, actual1);

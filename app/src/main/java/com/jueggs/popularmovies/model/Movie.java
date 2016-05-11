@@ -12,7 +12,7 @@ public class Movie implements Parcelable
     public static final int ENCODE_BIT_SHIFT = 16;
     public static final int MAX_GENRE_IDS = 4;
 
-    private int dbId;
+    private long dbId;
     private int movieId;
     private String title;
     private Date releaseDate;
@@ -30,7 +30,7 @@ public class Movie implements Parcelable
 
     protected Movie(Parcel in)
     {
-        dbId = in.readInt();
+        dbId = in.readLong();
         movieId = in.readInt();
         title = in.readString();
         releaseDate = (Date) in.readSerializable();
@@ -52,7 +52,7 @@ public class Movie implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeInt(dbId);
+        dest.writeLong(dbId);
         dest.writeInt(movieId);
         dest.writeString(title);
         dest.writeSerializable(releaseDate);
@@ -80,12 +80,12 @@ public class Movie implements Parcelable
         }
     };
 
-    public int getDbId()
+    public long getDbId()
     {
         return dbId;
     }
 
-    public void setDbId(int dbId)
+    public void setDbId(long dbId)
     {
         this.dbId = dbId;
     }
@@ -117,7 +117,7 @@ public class Movie implements Parcelable
 
     public void setPosterPath(String posterPath)
     {
-        this.posterPath = posterPath.substring(1);
+        this.posterPath = posterPath.charAt(0) == '/' ? posterPath.substring(1) : posterPath;
     }
 
     public Date getReleaseDate()
@@ -184,7 +184,7 @@ public class Movie implements Parcelable
         return encoded;
     }
 
-    public int[] decodeGenreIds(long encoded)
+    public void decodeGenreIds(long encoded)
     {
         int[] ids = new int[MAX_GENRE_IDS];
 
@@ -193,7 +193,7 @@ public class Movie implements Parcelable
             int shift = i * ENCODE_BIT_SHIFT;
             ids[i] = (int) ((encoded >> shift) & 0xffff);
         }
-        return ids;
+        setGenreIds(ids);
     }
 
     public String getOriginalLanguage()
@@ -214,21 +214,5 @@ public class Movie implements Parcelable
     public void setOriginalTitle(String originalTitle)
     {
         this.originalTitle = originalTitle;
-    }
-
-    public ContentValues toContentValues()
-    {
-        ContentValues values = new ContentValues();
-        values.put(FavouriteColumns.ADULT, isAdult());
-        values.put(FavouriteColumns.GENRE_IDS, encodeGenreIds());
-        values.put(FavouriteColumns.MOVIE_ID, getMovieId());
-        values.put(FavouriteColumns.ORIG_LANG, getOriginalLanguage());
-        values.put(FavouriteColumns.ORIG_TITLE, getOriginalTitle());
-        values.put(FavouriteColumns.OVERVIEW, getOverview());
-        values.put(FavouriteColumns.POSTER_PATH, getPosterPath());
-        values.put(FavouriteColumns.TITLE, getTitle());
-        values.put(FavouriteColumns.REL_DATE, getReleaseDate().getTime());
-        values.put(FavouriteColumns.VOTE_AVERAGE, getVoteAverage());
-        return values;
     }
 }

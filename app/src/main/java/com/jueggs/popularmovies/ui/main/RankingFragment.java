@@ -1,10 +1,12 @@
 package com.jueggs.popularmovies.ui.main;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -15,11 +17,15 @@ import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
+import com.jueggs.popularmovies.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
+import static com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns.*;
+import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
+import static com.jueggs.popularmovies.util.Utils.*;
 
 
 public class RankingFragment extends Fragment
@@ -32,6 +38,7 @@ public class RankingFragment extends Fragment
     private RankingAdapter rankingAdapter;
     private RankingRepository repository;
     private int sortOrder = SORTORDER_INVALID;
+    private SparseArray<String> titles = new SparseArray<>(NUM_SORTORDER);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -40,10 +47,13 @@ public class RankingFragment extends Fragment
         setHasOptionsMenu(true);
 
         if (savedInstanceState != null)
-        {
             sortOrder = savedInstanceState.getInt(STATE_SORTORDER);
 
-        }
+        titles.put(SORTORDER_POPULAR, getString(R.string.title_popular));
+        titles.put(SORTORDER_TOPRATED, getString(R.string.title_toprated));
+        titles.put(SORTORDER_FAVOURITE, getString(R.string.title_favourites));
+
+        repository = RankingRepository.getInstance(getActivity().getApplicationContext());
     }
 
     @Nullable
@@ -57,8 +67,15 @@ public class RankingFragment extends Fragment
         gridView.setAdapter(rankingAdapter);
         gridView.setOnItemClickListener(posterClickListener);
 
-        repository = RankingRepository.getInstance(getActivity().getApplicationContext());
-        repository.loadMovies(sortOrder != SORTORDER_INVALID ? sortOrder : SORTORDER_POPULAR, moviesLoadedCallback);
+        switch (sortOrder)
+        {
+            case SORTORDER_POPULAR:
+            case SORTORDER_TOPRATED:
+                repository.loadMovies(sortOrder, moviesLoadedCallback);
+                break;
+            case SORTORDER_FAVOURITE:
+                loadFavourites();
+        }
 
         return view;
     }
@@ -104,14 +121,8 @@ public class RankingFragment extends Fragment
     {
         rankingAdapter.clear();
         rankingAdapter.addAll(movies);
-        setTitle(sortOrder);
+        getActivity().setTitle(String.format(getString(R.string.format_title), titles.get(sortOrder)));
         RankingFragment.this.sortOrder = sortOrder;
-    }
-
-    private void setTitle(int sortOrder)
-    {
-        String title = getString(sortOrder == SORTORDER_POPULAR ? R.string.title_popular : R.string.title_toprated);
-        getActivity().setTitle(String.format(getString(R.string.format_title), title));
     }
 
     private void handleFailedMovieUpdate(String msg)
@@ -127,25 +138,37 @@ public class RankingFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        menu.findItem(R.id.menu_refresh).setEnabled((sortOrder & MASK_SORTORDER_REFRESHABLE) != 0);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
         {
-            case R.id.menuPopular:
+            case R.id.menu_popular:
                 repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback);
                 break;
-            case R.id.menuToprated:
+            case R.id.menu_toprated:
                 repository.loadMovies(SORTORDER_TOPRATED, moviesLoadedCallback);
                 break;
-            case R.id.menuRefresh:
-                if ((this.sortOrder & MASK_SORTORDER_VALID) != 0)
-                {
-                    repository.clear(this.sortOrder);
-                    repository.loadMovies(this.sortOrder, moviesLoadedCallback);
-                }
+            case R.id.menu_refresh:
+                repository.clear(sortOrder);
+                repository.loadMovies(sortOrder, moviesLoadedCallback);
+                break;
+            case R.id.menu_favourites:
+                loadFavourites();
                 break;
         }
         return true;
+    }
+
+    private void loadFavourites()
+    {
+        Cursor cursor = getContext().getContentResolver().query(Favourite.BASE_URI, PROJECTION_COMPLETE, null, null, null);
+        updateMovies(transformCursorToMovies(cursor), SORTORDER_FAVOURITE);
     }
 
     @Override
