@@ -10,26 +10,21 @@ import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
 import com.jueggs.popularmovies.ui.detail.DetailFragment;
 
-public class MainActivity extends AppCompatActivity implements RankingFragment.Callback
+import java.util.List;
+
+import static com.jueggs.popularmovies.util.Utils.*;
+
+public class MainActivity extends AppCompatActivity implements Callback.MovieSelected, Callback.MoviesLoaded
 {
+    private boolean startup = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle(getString(R.string.title));
-
         App.getInstance().setTwoPane(findViewById(R.id.container) != null);
-
-        if (App.getInstance().isTwoPane())
-        {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-            if (fragment == null)
-            {
-                getSupportFragmentManager().beginTransaction().add(R.id.container, new StartupFragment()).commit();
-            }
-        }
     }
 
     @Override
@@ -44,6 +39,27 @@ public class MainActivity extends AppCompatActivity implements RankingFragment.C
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
             startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
+    {
+        if (App.getInstance().isTwoPane() && startup)
+        {
+            Fragment fragment;
+            if (!isEmpty(movies))
+            {
+                fragment = DetailFragment.createInstance(movies.get(0));
+                ((RankingFragment)getSupportFragmentManager().findFragmentByTag(getString(R.string.ranking_fragment_tag))).selectFirstItem();
+            }
+            else
+            {
+                fragment = new AlternativeFragment();
+            }
+
+            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
+            startup = false;
         }
     }
 }

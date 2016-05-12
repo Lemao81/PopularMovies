@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.SparseArray;
 import com.jueggs.popularmovies.data.service.FetchRankingService;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.ui.main.Callback;
 import com.jueggs.popularmovies.util.DateTimeUtils;
 
 import java.util.Collections;
@@ -25,7 +26,7 @@ public class RankingRepository
     private FetchRankingService service = FetchRankingService.getInstance();
 
     private Date lastUpdate = new Date();
-    private MovieLoadedCallback callback;
+    private Callback.MoviesLoaded callback;
     private Context context;
 
     private RankingRepository(Context context)
@@ -34,11 +35,11 @@ public class RankingRepository
         this.context = context;
     }
 
-    public void loadMovies(int sortOrder, MovieLoadedCallback callback)
+    public void loadMovies(int sortOrder, Callback.MoviesLoaded callback)
     {
         if (!isExpired() && !isEmpty(cache.get(sortOrder)))
         {
-            callback.onMoviesLoaded(sortOrder, RC_OK_CACHE, Collections.unmodifiableList(cache.get(sortOrder)));
+            callback.onMoviesLoaded(Collections.unmodifiableList(cache.get(sortOrder)), sortOrder, RC_OK_CACHE);
         }
         else
         {
@@ -49,20 +50,20 @@ public class RankingRepository
             }
             else
             {
-                callback.onMoviesLoaded(sortOrder, RC_NO_NETWORK, null);
+                callback.onMoviesLoaded(null, sortOrder, RC_NO_NETWORK);
             }
         }
     }
 
-    private MovieLoadedCallback moviesLoadedCallback = new MovieLoadedCallback()
+    private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
     {
         @Override
-        public void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies)
+        public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
         {
             cache.put(sortOrder, movies);
             lastUpdate = new Date();
             if (callback != null)
-                callback.onMoviesLoaded(sortOrder, resultCode, movies);
+                callback.onMoviesLoaded(movies, sortOrder, resultCode);
         }
     };
 

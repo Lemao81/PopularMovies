@@ -12,22 +12,23 @@ import android.view.ViewGroup;
 import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 import com.jueggs.popularmovies.data.repo.ReviewRepository;
 import com.jueggs.popularmovies.data.repo.TrailerRepository;
+import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
-import com.jueggs.popularmovies.util.Utils;
-import com.squareup.picasso.Picasso;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
-import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
 import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
@@ -89,6 +90,22 @@ public class DetailFragment extends Fragment
         return view;
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        if (App.getInstance().isTwoPane())
+            EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        if (App.getInstance().isTwoPane())
+            EventBus.getDefault().unregister(this);
+    }
+
     private void bindView(Movie movie)
     {
         title.setText(movie.getTitle());
@@ -110,8 +127,7 @@ public class DetailFragment extends Fragment
             if (isFavourite)
             {
                 contentResolver.delete(favouriteIdUri, null, null);
-                setStarDrawable(false);
-                isFavourite = false;
+                removeFavourite();
                 Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
             }
             else
@@ -124,12 +140,18 @@ public class DetailFragment extends Fragment
         }
     };
 
+    private void removeFavourite()
+    {
+        setStarDrawable(false);
+        isFavourite = false;
+    }
+
     private void setStarDrawable(boolean checked)
     {
         favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
     }
 
-    private TrailerLoadedCallback trailerLoadedCallback = new TrailerLoadedCallback()
+    private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
     {
         @Override
         public void onTrailerLoaded(List<Trailer> trailers, int resultCode)
@@ -156,10 +178,10 @@ public class DetailFragment extends Fragment
         }
     };
 
-    private ReviewLoadedCallback reviewLoadedCallback = new ReviewLoadedCallback()
+    private Callback.ReviewsLoaded reviewLoadedCallback = new Callback.ReviewsLoaded()
     {
         @Override
-        public void onReviewLoaded(List<Review> reviews, int resultCode)
+        public void onReviewsLoaded(List<Review> reviews, int resultCode)
         {
             DetailFragment.this.reviews = reviews;
             reviewLoaded = true;
@@ -191,6 +213,14 @@ public class DetailFragment extends Fragment
     private void handleFailedUpdate(String message)
     {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe
+    public void onFavouriteDeleted(FavouriteDeletedEvent event)
+    {
+        int movieId = event.movieId;
+        if (movieId == movie.getMovieId())
+            removeFavourite();
     }
 
 }

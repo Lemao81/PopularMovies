@@ -10,17 +10,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 import com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider;
+import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
 import com.jueggs.popularmovies.ui.detail.DetailFragment;
 import com.jueggs.popularmovies.util.Utils;
 import com.squareup.picasso.Picasso;
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -66,7 +69,12 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     {
         Cursor cursor = getCursor();
         cursor.moveToPosition(position);
-        context.getContentResolver().delete(Favourite.withMovieId(cursor.getInt(MOVIE_ID)), null, null);
+        int movieId = cursor.getInt(MOVIE_ID);
+        context.getContentResolver().delete(Favourite.withMovieId(movieId), null, null);
+        Toast.makeText(context, R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
+
+        if (App.getInstance().isTwoPane())
+            EventBus.getDefault().post(new FavouriteDeletedEvent(movieId));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -86,9 +94,8 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         @Override
         public void onClick(View v)
         {
-            Cursor cursor = getCursor();
-            cursor.moveToPosition(getAdapterPosition());
-            Movie movie = transformCursorToMovies(cursor).get(0);
+            getCursor().moveToPosition(getAdapterPosition());
+            Movie movie = transformCurrentCursorPositionToMovie(getCursor());
 
             callback.onMovieSelected(movie);
         }

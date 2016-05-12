@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.ui.detail.Callback;
 
 import java.util.List;
 
@@ -18,13 +19,13 @@ public class FetchTrailerService
 
     private static FetchTrailerService instance;
 
-    private TrailerLoadedCallback callback;
+    private Callback.TrailerLoaded callback;
 
     private FetchTrailerService()
     {
     }
 
-    public void fetchTrailers(int movieId, TrailerLoadedCallback callback)
+    public void fetchTrailers(int movieId, Callback.TrailerLoaded callback)
     {
         this.callback = callback;
         new FetchTrailerTask().execute(movieId);

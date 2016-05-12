@@ -1,5 +1,6 @@
 package com.jueggs.popularmovies.ui.main;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -47,12 +48,11 @@ public class RankingFragment extends Fragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        if (savedInstanceState != null)
-            sortOrder = savedInstanceState.getInt(STATE_SORTORDER);
-
         titles.put(SORTORDER_POPULAR, getString(R.string.title_popular));
         titles.put(SORTORDER_TOPRATED, getString(R.string.title_toprated));
-        titles.put(SORTORDER_FAVOURITE, getString(R.string.title_favourites));
+
+        if (savedInstanceState != null)
+            sortOrder = savedInstanceState.getInt(STATE_SORTORDER);
 
         repository = RankingRepository.getInstance(getActivity().getApplicationContext());
     }
@@ -68,18 +68,22 @@ public class RankingFragment extends Fragment
         gridView.setAdapter(rankingAdapter);
         gridView.setOnItemClickListener(posterClickListener);
 
-        switch (sortOrder)
-        {
-            case SORTORDER_POPULAR:
-            case SORTORDER_TOPRATED:
-                repository.loadMovies(sortOrder, moviesLoadedCallback);
-                break;
-            case SORTORDER_FAVOURITE:
-                //TODO check
-                loadFavourites();
-        }
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        repository.loadMovies(sortOrder, moviesLoadedCallback);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        setTitle(sortOrder);
     }
 
     private AdapterView.OnItemClickListener posterClickListener = new AdapterView.OnItemClickListener()
@@ -88,14 +92,14 @@ public class RankingFragment extends Fragment
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
             Movie movie = rankingAdapter.getItem(position);
-            ((Callback) getActivity()).onMovieSelected(movie);
+            ((Callback.MovieSelected) getActivity()).onMovieSelected(movie);
         }
     };
 
-    private MovieLoadedCallback moviesLoadedCallback = new MovieLoadedCallback()
+    private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
     {
         @Override
-        public void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies)
+        public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
         {
             switch (resultCode)
             {
@@ -113,6 +117,7 @@ public class RankingFragment extends Fragment
                 default:
                     Log.e(TAG, "unknown result code");
             }
+            ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(movies, sortOrder, resultCode);
         }
     };
 
@@ -120,8 +125,23 @@ public class RankingFragment extends Fragment
     {
         rankingAdapter.clear();
         rankingAdapter.addAll(movies);
-        getActivity().setTitle(String.format(getString(R.string.format_title), titles.get(sortOrder)));
+        setTitle(sortOrder);
         RankingFragment.this.sortOrder = sortOrder;
+    }
+
+    private void setTitle(int sortOrder)
+    {
+        String title;
+        if (sortOrder == SORTORDER_INVALID)
+            title = getString(R.string.title);
+        else
+            title = String.format(getString(R.string.format_title), titles.get(sortOrder));
+        getActivity().setTitle(title);
+    }
+
+    public void selectFirstItem()
+    {
+        //TODO select/activate first gridview item. failed so far  :(
     }
 
     private void handleFailedMovieUpdate(String msg)
@@ -158,25 +178,15 @@ public class RankingFragment extends Fragment
                 repository.loadMovies(sortOrder, moviesLoadedCallback);
                 break;
             case R.id.menu_favourites:
-                loadFavourites();
+                startActivity(new Intent(getContext(), FavouriteActivity.class));
                 break;
         }
         return true;
-    }
-
-    private void loadFavourites()
-    {
-        startActivity(new Intent(getContext(), FavouriteActivity.class));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
         outState.putInt(STATE_SORTORDER, sortOrder);
-    }
-
-    public interface Callback
-    {
-        void onMovieSelected(Movie movie);
     }
 }

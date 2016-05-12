@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.ui.main.Callback;
 
 import java.util.List;
 
@@ -19,14 +20,14 @@ public class FetchRankingService
 
     private static FetchRankingService instance;
 
-    private MovieLoadedCallback callback;
+    private Callback.MoviesLoaded callback;
     private int sortOrder;
 
     private FetchRankingService()
     {
     }
 
-    public void fetchMovies(int sortOrder, MovieLoadedCallback callback)
+    public void fetchMovies(int sortOrder, Callback.MoviesLoaded callback)
     {
         this.callback = callback;
         this.sortOrder = sortOrder;
@@ -56,12 +57,12 @@ public class FetchRankingService
             if (callback != null)
                 if (movies != null)
                 {
-                    callback.onMoviesLoaded(sortOrder, RC_OK_NETWORK, movies);
+                    callback.onMoviesLoaded(movies, sortOrder, RC_OK_NETWORK);
                 }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");
-                    callback.onMoviesLoaded(sortOrder, RC_ERROR, null);
+                    callback.onMoviesLoaded(null, sortOrder, RC_ERROR);
                 }
         }
 

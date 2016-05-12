@@ -10,14 +10,12 @@ import android.webkit.WebView;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.MovieDbContract;
 
-public class StartupFragment extends Fragment
+public class AlternativeFragment extends Fragment
 {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        WebView webView = new WebView(getContext());
-        webView.loadUrl(MovieDbContract.MOVIEDB_WEBSITE);
-        return webView;
+        return inflater.inflate(R.layout.fragment_alternative, container, false);
     }
 }

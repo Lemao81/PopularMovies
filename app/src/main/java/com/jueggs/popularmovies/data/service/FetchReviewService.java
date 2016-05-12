@@ -6,6 +6,7 @@ import android.util.Log;
 import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.ui.detail.Callback;
 
 import java.util.List;
 
@@ -20,13 +21,13 @@ public class FetchReviewService
 
     private static FetchReviewService instance;
 
-    private MovieDbContract.ReviewLoadedCallback callback;
+    private Callback.ReviewsLoaded callback;
 
     private FetchReviewService()
     {
     }
 
-    public void fetchReviews(int movieId, MovieDbContract.ReviewLoadedCallback callback)
+    public void fetchReviews(int movieId, Callback.ReviewsLoaded callback)
     {
         this.callback = callback;
         new FetchReviewTask().execute(movieId);
@@ -61,12 +62,12 @@ public class FetchReviewService
             if (callback != null)
                 if (reviews != null)
                 {
-                    callback.onReviewLoaded(reviews, RC_OK_NETWORK);
+                    callback.onReviewsLoaded(reviews, RC_OK_NETWORK);
                 }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");
-                    callback.onReviewLoaded(reviews, RC_ERROR);
+                    callback.onReviewsLoaded(reviews, RC_ERROR);
                 }
 
         }

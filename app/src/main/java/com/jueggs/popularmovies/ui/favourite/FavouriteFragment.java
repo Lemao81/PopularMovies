@@ -2,6 +2,7 @@ package com.jueggs.popularmovies.ui.favourite;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -15,12 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 import com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider;
 import com.jueggs.popularmovies.model.Movie;
 
-public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Callback.MovieSelected
+public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
     public static final int LOADER_ID = 0;
 
@@ -44,7 +46,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), null, this));
+        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), null, (Callback.MovieSelected) getActivity()));
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;
@@ -57,20 +59,25 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor data)
     {
         adapter.swapCursor(data);
+        if (App.getInstance().isTwoPane())
+        {
+            new Handler().post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(data);
+                }
+            });
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
         adapter.swapCursor(null);
-    }
-
-    @Override
-    public void onMovieSelected(Movie movie)
-    {
-        ((Callback.MovieSelected)getActivity()).onMovieSelected(movie);
     }
 }

@@ -14,9 +14,8 @@ public class MovieDbContract
     public static final int SORTORDER_INVALID = -1;
     public static final int SORTORDER_POPULAR = 1;
     public static final int SORTORDER_TOPRATED = 2;
-    public static final int SORTORDER_FAVOURITE = 4;
     public static final int MASK_SORTORDER_REFRESHABLE = SORTORDER_POPULAR | SORTORDER_TOPRATED;
-    public static final int NUM_SORTORDER = 3;
+    public static final int NUM_SORTORDER = 2;
 
     public static final int RC_OK_CACHE = 0;
     public static final int RC_OK_NETWORK = 1;
@@ -125,20 +124,5 @@ public class MovieDbContract
     public static Uri createYoutubeUri(String key)
     {
         return Uri.parse(BASE_URL_YOUTUBE).buildUpon().appendQueryParameter(QUERY_KEY_YOUTUBE_VIDEO, key).build();
-    }
-
-    public interface MovieLoadedCallback
-    {
-        void onMoviesLoaded(int sortOrder, int resultCode, List<Movie> movies);
-    }
-
-    public interface TrailerLoadedCallback
-    {
-        void onTrailerLoaded(List<Trailer> trailers, int resultCode);
-    }
-
-    public interface ReviewLoadedCallback
-    {
-        void onReviewLoaded(List<Review> reviews, int resultCode);
     }
 }

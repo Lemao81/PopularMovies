@@ -4,18 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment android:id="@+id/ranking"
+        android:name="com.jueggs.popularmovies.ui.main.RankingFragment"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/ranking"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="@integer/master_fraction"
-        android:name="com.jueggs.popularmovies.ui.main.RankingFragment"
+        android:tag="@string/ranking_fragment_tag"
         tools:layout="@layout/fragment_main" />
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout android:id="@+id/container"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="@integer/detail_fraction"
-        android:id="@+id/container" />
+        android:layout_weight="@integer/detail_fraction" />
 </LinearLayout>

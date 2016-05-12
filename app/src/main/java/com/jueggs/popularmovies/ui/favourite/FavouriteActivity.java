@@ -1,6 +1,7 @@
 package com.jueggs.popularmovies.ui.favourite;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -9,10 +10,14 @@ import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
 import com.jueggs.popularmovies.ui.detail.DetailFragment;
-import com.jueggs.popularmovies.ui.main.StartupFragment;
+import com.jueggs.popularmovies.ui.main.AlternativeFragment;
 
-public class FavouriteActivity extends AppCompatActivity implements Callback.MovieSelected
+import static com.jueggs.popularmovies.util.Utils.*;
+
+public class FavouriteActivity extends AppCompatActivity implements Callback.MovieSelected, Callback.MoviesLoaded
 {
+    private boolean startup = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -20,15 +25,6 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
         setContentView(R.layout.activity_favourite);
 
         setTitle(String.format(getString(R.string.format_title), getString(R.string.title_favourites)));
-
-        if (App.getInstance().isTwoPane())
-        {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-            if (fragment == null)
-            {
-                getSupportFragmentManager().beginTransaction().add(R.id.container, new StartupFragment()).commit();
-            }
-        }
     }
 
     @Override
@@ -42,8 +38,23 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
         {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
-            this.startActivity(intent);
+            startActivity(intent);
         }
     }
 
+    @Override
+    public void onMoviesLoaded(Cursor data)
+    {
+        if (App.getInstance().isTwoPane() && startup)
+        {
+            Fragment fragment;
+            if (data.moveToFirst())
+                fragment = DetailFragment.createInstance(transformCurrentCursorPositionToMovie(data));
+            else
+                fragment = new AlternativeFragment();
+
+            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
+            startup = false;
+        }
+    }
 }

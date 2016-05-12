@@ -6,6 +6,7 @@ import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.data.service.FetchReviewService;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.ui.detail.Callback;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,14 +23,14 @@ public class ReviewRepository
     private FetchReviewService service = FetchReviewService.getInstance();
 
     private Context context;
-    private MovieDbContract.ReviewLoadedCallback callback;
+    private Callback.ReviewsLoaded callback;
     private int movieId;
 
-    public void loadReviews(int movieId, MovieDbContract.ReviewLoadedCallback callback)
+    public void loadReviews(int movieId, Callback.ReviewsLoaded callback)
     {
         if (cache.get(movieId) != null)
         {
-            callback.onReviewLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
+            callback.onReviewsLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
         }
         else
         {
@@ -41,19 +42,19 @@ public class ReviewRepository
             }
             else
             {
-                callback.onReviewLoaded(null, RC_NO_NETWORK);
+                callback.onReviewsLoaded(null, RC_NO_NETWORK);
             }
         }
     }
 
-    private MovieDbContract.ReviewLoadedCallback reviewsLoadedCallback = new MovieDbContract.ReviewLoadedCallback()
+    private Callback.ReviewsLoaded reviewsLoadedCallback = new Callback.ReviewsLoaded()
     {
         @Override
-        public void onReviewLoaded(List<Review> reviews, int resultCode)
+        public void onReviewsLoaded(List<Review> reviews, int resultCode)
         {
             cache.put(movieId, reviews);
             if (callback != null)
-                callback.onReviewLoaded(reviews, resultCode);
+                callback.onReviewsLoaded(reviews, resultCode);
         }
     };
 

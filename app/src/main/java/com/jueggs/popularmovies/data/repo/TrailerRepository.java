@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.SparseArray;
 import com.jueggs.popularmovies.data.service.FetchTrailerService;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.ui.detail.Callback;
 import com.jueggs.popularmovies.util.NetUtils;
 
 import java.util.Collections;
@@ -20,10 +21,10 @@ public class TrailerRepository
     private FetchTrailerService service = FetchTrailerService.getInstance();
 
     private Context context;
-    private TrailerLoadedCallback callback;
+    private Callback.TrailerLoaded callback;
     private int movieId;
 
-    public void loadTrailers(int movieId, TrailerLoadedCallback callback)
+    public void loadTrailers(int movieId, Callback.TrailerLoaded callback)
     {
         if (cache.get(movieId) != null)
         {
@@ -44,7 +45,7 @@ public class TrailerRepository
         }
     }
 
-    private TrailerLoadedCallback trailerLoadedCallback = new TrailerLoadedCallback()
+    private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
     {
         @Override
         public void onTrailerLoaded(List<Trailer> trailers, int resultCode)

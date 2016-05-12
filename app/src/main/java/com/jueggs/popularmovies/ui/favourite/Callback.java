@@ -1,5 +1,6 @@
 package com.jueggs.popularmovies.ui.favourite;
 
+import android.database.Cursor;
 import com.jueggs.popularmovies.model.Movie;
 
 public interface Callback
@@ -12,5 +13,10 @@ public interface Callback
     interface MovieSwiped
     {
         void onMovieSwiped(int position);
+    }
+
+    interface MoviesLoaded
+    {
+        void onMoviesLoaded(Cursor data);
     }
 }

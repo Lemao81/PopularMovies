@@ -60,6 +60,24 @@ public class Utils
         return movies;
     }
 
+    public static Movie transformCurrentCursorPositionToMovie(Cursor cursor)
+    {
+        Movie movie = new Movie();
+        movie.setDbId(cursor.getLong(_ID));
+        movie.setMovieId(cursor.getInt(MOVIE_ID));
+        movie.setTitle(cursor.getString(TITLE));
+        movie.setReleaseDate(new Date(cursor.getLong(REL_DATE)));
+        movie.setPosterPath(cursor.getString(POSTER_PATH));
+        movie.setVoteAverage(cursor.getFloat(VOTE_AVERAGE));
+        movie.setOverview(cursor.getString(OVERVIEW));
+        movie.setGenreIds(decodeGenreIds(cursor.getLong(GENRE_IDS)));
+        movie.setAdult(cursor.getInt(ADULT) > 0);
+        movie.setOriginalTitle(cursor.getString(ORIG_TITLE));
+        movie.setOriginalLanguage(cursor.getString(ORIG_LANG));
+
+        return movie;
+    }
+
     public static ContentValues transformMovieToContentValues(Movie movie)
     {
         ContentValues values = new ContentValues();
