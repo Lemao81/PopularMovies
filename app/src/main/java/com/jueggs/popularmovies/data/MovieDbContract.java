@@ -68,10 +68,33 @@ public class MovieDbContract
 
     public static final String DATE_PATTERN = "yyyy-MM-dd";
 
+    public static final SparseArray<String> GENRES = new SparseArray<>();
+
     static
     {
         PATHS.put(SORTORDER_POPULAR, PATH_POPULAR);
         PATHS.put(SORTORDER_TOPRATED, PATH_TOPRATED);
+
+        GENRES.put(28, "Action");
+        GENRES.put(12, "Adventure");
+        GENRES.put(16, "Animation");
+        GENRES.put(35, "Comedy");
+        GENRES.put(80, "Crime");
+        GENRES.put(99, "Documentary");
+        GENRES.put(18, "Drama");
+        GENRES.put(10751, "Family");
+        GENRES.put(14, "Fantasy");
+        GENRES.put(10769, "Foreign");
+        GENRES.put(36, "History");
+        GENRES.put(27, "Horror");
+        GENRES.put(10402, "Music");
+        GENRES.put(9648, "Mystery");
+        GENRES.put(10749, "Romance");
+        GENRES.put(878, "Science Fiction");
+        GENRES.put(10770, "TV Movie");
+        GENRES.put(53, "Thriller");
+        GENRES.put(10752, "War");
+        GENRES.put(37, "Western");
     }
 
     public static Uri createRankingUri(int sortOrder)

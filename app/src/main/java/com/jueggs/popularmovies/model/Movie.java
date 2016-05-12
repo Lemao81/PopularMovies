@@ -170,32 +170,6 @@ public class Movie implements Parcelable
         this.genreIds = genreIds;
     }
 
-    //save up to 4 genre ids as 16 bit chunks in a long value
-    public long encodeGenreIds()
-    {
-        long encoded = 0;
-
-        for (int i = MAX_GENRE_IDS - 1; i >= 0; i--)
-        {
-            int shift = i * ENCODE_BIT_SHIFT;
-            int id = getGenreIds()[i];
-            encoded = ((encoded >> shift) | (0xffff & id)) << shift;
-        }
-        return encoded;
-    }
-
-    public void decodeGenreIds(long encoded)
-    {
-        int[] ids = new int[MAX_GENRE_IDS];
-
-        for (int i = 0; i < MAX_GENRE_IDS; i++)
-        {
-            int shift = i * ENCODE_BIT_SHIFT;
-            ids[i] = (int) ((encoded >> shift) & 0xffff);
-        }
-        setGenreIds(ids);
-    }
-
     public String getOriginalLanguage()
     {
         return originalLanguage;

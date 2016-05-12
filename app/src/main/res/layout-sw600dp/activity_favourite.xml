@@ -6,12 +6,12 @@
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/ranking"
+        android:id="@+id/favourite"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="@integer/master_fraction"
-        android:name="com.jueggs.popularmovies.ui.main.RankingFragment"
-        tools:layout="@layout/fragment_main" />
+        android:name="com.jueggs.popularmovies.ui.favourite.FavouriteFragment"
+        tools:layout="@layout/fragment_favourite" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dp"

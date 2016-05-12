@@ -29,6 +29,7 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
 import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
+import static com.jueggs.popularmovies.util.Utils.*;
 
 public class DetailFragment extends Fragment
 {
@@ -43,6 +44,7 @@ public class DetailFragment extends Fragment
     @Bind(R.id.overview) TextView overview;
     @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
     @Bind(R.id.favourite) ImageButton favourite;
+    @Bind(R.id.genre) TextView genre;
 
     private Movie movie;
     private List<Trailer> trailers;
@@ -52,6 +54,7 @@ public class DetailFragment extends Fragment
     private boolean isFavourite;
     private Uri favouriteIdUri;
     private ContentResolver contentResolver;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(RELEASE_DATE_PATTERN);
 
     public static DetailFragment createInstance(Movie movie)
     {
@@ -73,8 +76,7 @@ public class DetailFragment extends Fragment
         if (movie == null)
             getActivity().finish();
 
-        Uri uri = createImageUri(IMG_WIDTH_185, movie.getPosterPath());
-        Picasso.with(getContext()).load(uri).placeholder(R.drawable.picasso_placeholder).error(R.drawable.picasso_error).into(thumbnail);
+        loadImage(getContext(), IMG_WIDTH_185, movie.getPosterPath(), thumbnail);
 
         favouriteIdUri = Favourite.withMovieId(movie.getMovieId());
         contentResolver = getContext().getContentResolver();
@@ -89,14 +91,14 @@ public class DetailFragment extends Fragment
 
     private void bindView(Movie movie)
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(RELEASE_DATE_PATTERN);
         title.setText(movie.getTitle());
         releaseDate.setText(dateFormat.format(movie.getReleaseDate()));
         voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
         overview.setText(movie.getOverview());
+        genre.setText(createGenreString(movie.getGenreIds()));
 
         isFavourite = contentResolver.query(favouriteIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
-        changeStarDrawable(isFavourite);
+        setStarDrawable(isFavourite);
         favourite.setOnClickListener(addFavouriteClickListener);
     }
 
@@ -108,21 +110,21 @@ public class DetailFragment extends Fragment
             if (isFavourite)
             {
                 contentResolver.delete(favouriteIdUri, null, null);
-                changeStarDrawable(false);
+                setStarDrawable(false);
                 isFavourite = false;
                 Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
             }
             else
             {
-                contentResolver.insert(Favourite.BASE_URI, Utils.transformMovieToContentValues(movie));
-                changeStarDrawable(true);
+                contentResolver.insert(Favourite.BASE_URI, transformMovieToContentValues(movie));
+                setStarDrawable(true);
                 isFavourite = true;
                 Toast.makeText(getContext(), R.string.favourites_added_msg, Toast.LENGTH_LONG).show();
             }
         }
     };
 
-    private void changeStarDrawable(boolean checked)
+    private void setStarDrawable(boolean checked)
     {
         favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
     }

@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import com.jueggs.popularmovies.R;
 
-//copied from https://gist.github.com/JakeWharton/0a251d67649305d84e8a to be able to use touch-selector
+//copied from https://gist.github.com/JakeWharton/0a251d67649305d84e8a
 public class ForegroundImageView extends ImageView
 {
     private Drawable foreground;

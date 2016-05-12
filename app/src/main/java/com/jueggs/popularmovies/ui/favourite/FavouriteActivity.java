@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.ui.main;
+package com.jueggs.popularmovies.ui.favourite;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,18 +9,17 @@ import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
 import com.jueggs.popularmovies.ui.detail.DetailFragment;
+import com.jueggs.popularmovies.ui.main.StartupFragment;
 
-public class MainActivity extends AppCompatActivity implements RankingFragment.Callback
+public class FavouriteActivity extends AppCompatActivity implements Callback.MovieSelected
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_favourite);
 
-        setTitle(getString(R.string.title));
-
-        App.getInstance().setTwoPane(findViewById(R.id.container) != null);
+        setTitle(String.format(getString(R.string.format_title), getString(R.string.title_favourites)));
 
         if (App.getInstance().isTwoPane())
         {
@@ -43,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements RankingFragment.C
         {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
-            startActivity(intent);
+            this.startActivity(intent);
         }
     }
+
 }

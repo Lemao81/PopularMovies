@@ -14,6 +14,7 @@
     <string name="menu_refresh">Refresh</string>
 
     <string name="format_vote_average"><xliff:g id="vote_average">%.1f/10</xliff:g></string>
+    <string name="format_vote_average_short"><xliff:g id="vote_average">%.1f</xliff:g></string>
     <string name="format_trailer_size"><xliff:g id="size">%dp HD</xliff:g></string>
 
     <string name="trailer_header">Trailers:</string>
@@ -25,4 +26,6 @@
 
     <string name="favourites_added_msg">Added to favourites</string>
     <string name="favourites_removed_msg">Removed from favourites</string>
+
+    <string name="details_genre">Genre:</string>
 </resources>

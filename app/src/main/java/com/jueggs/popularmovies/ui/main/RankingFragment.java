@@ -17,6 +17,7 @@ import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DetailActivity;
+import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
 import com.jueggs.popularmovies.util.Utils;
 
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ public class RankingFragment extends Fragment
                 repository.loadMovies(sortOrder, moviesLoadedCallback);
                 break;
             case SORTORDER_FAVOURITE:
+                //TODO check
                 loadFavourites();
         }
 
@@ -164,8 +166,7 @@ public class RankingFragment extends Fragment
 
     private void loadFavourites()
     {
-        Cursor cursor = getContext().getContentResolver().query(Favourite.BASE_URI, PROJECTION_COMPLETE, null, null, null);
-        updateMovies(transformCursorToMovies(cursor), SORTORDER_FAVOURITE);
+        startActivity(new Intent(getContext(), FavouriteActivity.class));
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.jueggs.popularmovies;
 
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.util.Utils;
 import org.junit.Test;
 import org.junit.Test;
 
+import static com.jueggs.popularmovies.util.Utils.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -28,12 +30,12 @@ public class MovieTest
         Movie movie6 = createWithGenreIds(expected6);
 
         //Act
-        movie1.decodeGenreIds(movie1.encodeGenreIds());
-        movie2.decodeGenreIds(movie2.encodeGenreIds());
-        movie3.decodeGenreIds(movie3.encodeGenreIds());
-        movie4.decodeGenreIds(movie4.encodeGenreIds());
-        movie5.decodeGenreIds(movie5.encodeGenreIds());
-        movie6.decodeGenreIds(movie6.encodeGenreIds());
+        decodeGenreIds(encodeGenreIds(movie1.getGenreIds()));
+        decodeGenreIds(encodeGenreIds(movie2.getGenreIds()));
+        decodeGenreIds(encodeGenreIds(movie3.getGenreIds()));
+        decodeGenreIds(encodeGenreIds(movie4.getGenreIds()));
+        decodeGenreIds(encodeGenreIds(movie5.getGenreIds()));
+        decodeGenreIds(encodeGenreIds(movie6.getGenreIds()));
         int[] actual1 = movie1.getGenreIds();
         int[] actual2 = movie2.getGenreIds();
         int[] actual3 = movie3.getGenreIds();

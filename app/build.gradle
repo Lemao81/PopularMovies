@@ -16,8 +16,8 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    signingConfigs{
-        release{
+    signingConfigs {
+        release {
             storeFile file(keystore_file)
             storePassword keystore_password
             keyAlias key_alias
@@ -31,19 +31,21 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    buildTypes.each{
-            it.buildConfigField 'String', 'API_KEY', MovieDbApiKey
+    buildTypes.each {
+        it.buildConfigField 'String', 'API_KEY', MovieDbApiKey
     }
 }
 
-ext{
-    simonvtSchematicVersion="0.6.7"
+ext {
+    simonvtSchematicVersion = "0.6.7"
+    supportLibraryVersion = "23.3.0"
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
+    compile "com.android.support:design:${supportLibraryVersion}"
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.stetho:stetho:1.3.1'
