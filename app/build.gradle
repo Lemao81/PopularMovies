@@ -15,6 +15,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         release {
@@ -29,6 +31,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+    }
+    productFlavors{
+        mock{
+
+        }
+        prod{
+
         }
     }
     buildTypes.each {
@@ -46,6 +56,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
     compile "com.android.support:design:${supportLibraryVersion}"
+    compile "com.android.support:support-annotations:${supportLibraryVersion}"
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.stetho:stetho:1.3.1'
@@ -53,6 +64,10 @@ dependencies {
     compile "net.simonvt.schematic:schematic:${simonvtSchematicVersion}"
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.guava:guava:19.0'
+
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile "com.android.support:support-annotations:${supportLibraryVersion}"
+    androidTestCompile 'com.android.support.test:runner:0.5'
 
     testCompile 'junit:junit:4.12'
 

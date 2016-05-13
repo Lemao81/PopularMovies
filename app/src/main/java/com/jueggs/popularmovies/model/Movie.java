@@ -21,10 +21,26 @@ public class Movie implements Parcelable
     private boolean adult;
     private String originalTitle;
     private String originalLanguage;
-    private byte[] poster=new byte[0];
+    private byte[] poster = new byte[0];
 
     public Movie()
     {
+    }
+
+    public Movie(boolean adult, int[] genreIds, int movieId, String originalLanguage, String originalTitle,
+                 String overview, byte[] poster, String posterPath, Date releaseDate, String title, float voteAverage)
+    {
+        this.adult = adult;
+        this.genreIds = genreIds;
+        this.movieId = movieId;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
+        this.overview = overview;
+        this.poster = poster;
+        this.posterPath = posterPath;
+        this.releaseDate = releaseDate;
+        this.title = title;
+        this.voteAverage = voteAverage;
     }
 
     protected Movie(Parcel in)

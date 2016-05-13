@@ -2,7 +2,8 @@ package com.jueggs.popularmovies.data.repo;
 
 import android.content.Context;
 import android.util.SparseArray;
-import com.jueggs.popularmovies.data.service.FetchRankingService;
+import com.jueggs.popularmovies.data.service.Injection;
+import com.jueggs.popularmovies.data.service.RankingService;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.main.Callback;
 import com.jueggs.popularmovies.util.DateTimeUtils;
@@ -23,7 +24,7 @@ public class RankingRepository
     private static RankingRepository instance;
 
     private SparseArray<List<Movie>> cache = new SparseArray<>(NUM_SORTORDER);
-    private FetchRankingService service = FetchRankingService.getInstance();
+    private RankingService service = Injection.injectRankingService();
 
     private Date lastUpdate = new Date();
     private Callback.MoviesLoaded callback;

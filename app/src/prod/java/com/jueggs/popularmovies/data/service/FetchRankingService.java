@@ -14,7 +14,7 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.ParseUtils.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
 
-public class FetchRankingService
+public class FetchRankingService implements RankingService
 {
     public static final String TAG = FetchRankingService.class.getSimpleName();
 
