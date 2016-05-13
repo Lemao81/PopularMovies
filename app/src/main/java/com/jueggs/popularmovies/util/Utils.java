@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.model.Movie;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +37,11 @@ public class Utils
     public static <T> boolean isEmpty(List<T> list)
     {
         return list == null || list.size() == 0;
+    }
+
+    public static boolean isEmpty(byte[] array)
+    {
+        return array == null || array.length == 0;
     }
 
     public static List<Movie> transformCursorToMovies(Cursor cursor)
@@ -80,6 +86,7 @@ public class Utils
         movie.setAdult(cursor.getInt(ADULT) > 0);
         movie.setOriginalTitle(cursor.getString(ORIG_TITLE));
         movie.setOriginalLanguage(cursor.getString(ORIG_LANG));
+        movie.setPoster(cursor.getBlob(POSTER));
 
         return movie;
     }
@@ -142,8 +149,14 @@ public class Utils
 
     public static void loadImage(Context context, String width, String posterPath, ImageView view)
     {
+        loadImage(context, width, posterPath, view, null);
+    }
+
+    public static void loadImage(Context context, String width, String posterPath, ImageView view, Callback callback)
+    {
         Uri uri = createImageUri(width, posterPath);
-        Picasso.with(context).load(uri).placeholder(R.drawable.picasso_placeholder).error(R.drawable.picasso_error).into(view);
+        Picasso.with(context).load(uri).placeholder(R.drawable.picasso_placeholder)
+                .error(R.drawable.picasso_error).into(view, callback);
     }
 
     public static byte[] convertDrawableToByteArray(Drawable drawable)
@@ -158,7 +171,7 @@ public class Utils
         return baos.toByteArray();
     }
 
-    public static Drawable convertByteArrayToDrawable(Resources resources,byte[] bytes)
+    public static Drawable convertByteArrayToDrawable(Resources resources, byte[] bytes)
     {
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         return new BitmapDrawable(resources, bitmap);

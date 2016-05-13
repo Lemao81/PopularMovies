@@ -63,29 +63,4 @@ public class NetUtils
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
-
-    public static void loadImages(List<Movie> movies, String width)
-    {
-        for (Movie movie : movies)
-        {
-            if (!TextUtils.isEmpty(movie.getPosterPath()))
-            {
-                String url = createImageUri(width, movie.getPosterPath()).toString();
-                movie.setPoster(loadImage(url));
-            }
-        }
-    }
-
-    private static byte[] loadImage(String url)
-    {
-        try
-        {
-            return ByteStreams.toByteArray(new BufferedInputStream(new URL(url).openStream()));
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, e.getMessage());
-            return new byte[0];
-        }
-    }
 }

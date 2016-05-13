@@ -21,7 +21,7 @@ public class Movie implements Parcelable
     private boolean adult;
     private String originalTitle;
     private String originalLanguage;
-    private byte[] poster;
+    private byte[] poster=new byte[0];
 
     public Movie()
     {

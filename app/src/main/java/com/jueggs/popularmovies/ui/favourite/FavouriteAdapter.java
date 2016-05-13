@@ -18,6 +18,7 @@ import com.jueggs.popularmovies.model.Movie;
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_92;
@@ -52,7 +53,11 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         holder.vote_average.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
         holder.itemView.setOnClickListener(holder);
 
-        loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
+        byte[] posterBytes = cursor.getBlob(POSTER);
+        if (!isEmpty(posterBytes))
+            holder.thumbnail.setImageDrawable(convertByteArrayToDrawable(context.getResources(), posterBytes));
+        else
+            loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
     }
 
     @Override

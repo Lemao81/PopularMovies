@@ -15,6 +15,7 @@ import com.jueggs.popularmovies.model.Trailer;
 import java.util.List;
 import java.util.Locale;
 
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.Utils.isEmpty;
 
 public class DetailAdapter
@@ -47,7 +48,7 @@ public class DetailAdapter
                     @Override
                     public void onClick(View v)
                     {
-                        context.startActivity(new Intent(Intent.ACTION_VIEW).setData(MovieDbContract.createYoutubeUri(trailer.getKey())));
+                        context.startActivity(new Intent(Intent.ACTION_VIEW).setData(createYoutubeUri(trailer.getKey())));
                     }
                 });
                 ((TextView) view.findViewById(R.id.name)).setText(trailer.getName());

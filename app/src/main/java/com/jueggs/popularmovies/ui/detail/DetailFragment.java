@@ -101,6 +101,24 @@ public class DetailFragment extends Fragment
         return view;
     }
 
+    private void bindView(Movie movie)
+    {
+        title.setText(movie.getTitle());
+        releaseDate.setText(dateFormat.format(movie.getReleaseDate()));
+        voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
+        overview.setText(movie.getOverview());
+        genre.setText(createGenreString(movie.getGenreIds()));
+
+        if (isEmpty(movie.getPoster()))
+            loadImage(getContext(), IMG_WIDTH_185, movie.getPosterPath(), thumbnail, picassoCallback);
+        else
+            thumbnail.setImageDrawable(convertByteArrayToDrawable(getResources(), movie.getPoster()));
+
+        isFavourite = contentResolver.query(movieIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
+        setStarDrawable(isFavourite);
+        favourite.setOnClickListener(addFavouriteClickListener);
+    }
+
     @Override
     public void onStart()
     {
@@ -115,30 +133,6 @@ public class DetailFragment extends Fragment
         super.onStop();
         if (App.getInstance().isTwoPane())
             EventBus.getDefault().unregister(this);
-    }
-
-    private void bindView(Movie movie)
-    {
-        title.setText(movie.getTitle());
-        releaseDate.setText(dateFormat.format(movie.getReleaseDate()));
-        voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
-        overview.setText(movie.getOverview());
-        genre.setText(createGenreString(movie.getGenreIds()));
-
-        if (movie.getPoster() == null)
-        {
-            Uri uri = createImageUri(IMG_WIDTH_185, movie.getPosterPath());
-            Picasso.with(getContext()).load(uri).placeholder(R.drawable.picasso_placeholder)
-                    .error(R.drawable.picasso_error).into(thumbnail, picassoCallback);
-        }
-        else
-        {
-            thumbnail.setImageDrawable(convertByteArrayToDrawable(getResources(), movie.getPoster()));
-        }
-
-        isFavourite = contentResolver.query(movieIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
-        setStarDrawable(isFavourite);
-        favourite.setOnClickListener(addFavouriteClickListener);
     }
 
     private PicassoCallbackAdapter picassoCallback = new PicassoCallbackAdapter()

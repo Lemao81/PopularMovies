@@ -58,21 +58,4 @@ public class IOUtils
         }
         return buffer.toString();
     }
-
-    public static File imageBytesToFile(byte[] bytes)
-    {
-        File file = null;
-        try
-        {
-            file = new File("image.jpg");
-            file.createNewFile();
-            Files.write(bytes, file);
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
-        return file;
-    }
-
 }
