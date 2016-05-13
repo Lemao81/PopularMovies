@@ -1,8 +1,6 @@
 package com.jueggs.popularmovies.ui.main;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,17 +15,12 @@ import butterknife.ButterKnife;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.model.Movie;
-import com.jueggs.popularmovies.ui.detail.DetailActivity;
 import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
-import com.jueggs.popularmovies.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns.*;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
-import static com.jueggs.popularmovies.util.Utils.*;
 
 
 public class RankingFragment extends Fragment
@@ -64,10 +57,9 @@ public class RankingFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
 
-        rankingAdapter = new RankingAdapter(getContext(), 0, new ArrayList<Movie>());
+        rankingAdapter = new RankingAdapter(getContext(), new ArrayList<Movie>());
         gridView.setAdapter(rankingAdapter);
         gridView.setOnItemClickListener(posterClickListener);
-
 
         return view;
     }

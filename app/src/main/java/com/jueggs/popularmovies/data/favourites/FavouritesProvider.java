@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.data.favourites.schematic;
+package com.jueggs.popularmovies.data.favourites;
 
 import android.content.ContentResolver;
 import android.net.Uri;

@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.data.favourites.schematic;
+package com.jueggs.popularmovies.data.favourites;
 
 import net.simonvt.schematic.annotation.*;
 
@@ -18,6 +18,7 @@ public interface FavouriteColumns
     @DataType(INTEGER) @NotNull String ADULT = "adult";
     @DataType(TEXT) @NotNull String ORIG_TITLE = "orig_title";
     @DataType(TEXT) @NotNull String ORIG_LANG = "orig_lang";
+    @DataType(BLOB) @NotNull String POSTER = "poster";
 
     String[] PROJECTION_COMPLETE = new String[]{
             FavouriteColumns._ID,
@@ -30,7 +31,8 @@ public interface FavouriteColumns
             FavouriteColumns.GENRE_IDS,
             FavouriteColumns.ADULT,
             FavouriteColumns.ORIG_TITLE,
-            FavouriteColumns.ORIG_LANG};
+            FavouriteColumns.ORIG_LANG,
+            FavouriteColumns.POSTER};
 
     interface ProjectionCompleteIndices
     {
@@ -45,5 +47,6 @@ public interface FavouriteColumns
         int ADULT = 8;
         int ORIG_TITLE = 9;
         int ORIG_LANG = 10;
+        int POSTER = 11;
     }
 }

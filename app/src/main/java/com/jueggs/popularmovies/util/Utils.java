@@ -2,21 +2,27 @@ package com.jueggs.popularmovies.util;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.MovieDbContract;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
+import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.model.Movie;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns.ProjectionCompleteIndices.*;
+import static com.jueggs.popularmovies.data.favourites.FavouriteColumns.ProjectionCompleteIndices.*;
 
 
 public class Utils
@@ -91,6 +97,7 @@ public class Utils
         values.put(FavouriteColumns.TITLE, movie.getTitle());
         values.put(FavouriteColumns.REL_DATE, movie.getReleaseDate().getTime());
         values.put(FavouriteColumns.VOTE_AVERAGE, movie.getVoteAverage());
+        values.put(FavouriteColumns.POSTER, movie.getPoster());
         return values;
     }
 
@@ -137,5 +144,23 @@ public class Utils
     {
         Uri uri = createImageUri(width, posterPath);
         Picasso.with(context).load(uri).placeholder(R.drawable.picasso_placeholder).error(R.drawable.picasso_error).into(view);
+    }
+
+    public static byte[] convertDrawableToByteArray(Drawable drawable)
+    {
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    public static Drawable convertByteArrayToDrawable(Resources resources,byte[] bytes)
+    {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        return new BitmapDrawable(resources, bitmap);
     }
 }

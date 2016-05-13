@@ -1,9 +1,7 @@
 package com.jueggs.popularmovies.ui.favourite;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,23 +13,16 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider;
 import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
-import com.jueggs.popularmovies.ui.detail.DetailActivity;
-import com.jueggs.popularmovies.ui.detail.DetailFragment;
-import com.jueggs.popularmovies.util.Utils;
-import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_92;
-import static com.jueggs.popularmovies.data.MovieDbContract.createImageUri;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns.ProjectionCompleteIndices.*;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
+import static com.jueggs.popularmovies.data.favourites.FavouriteColumns.ProjectionCompleteIndices.*;
+import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
 public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter.ViewHolder> implements Callback.MovieSwiped

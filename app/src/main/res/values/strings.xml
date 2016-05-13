@@ -12,6 +12,7 @@
     <string name="menu_toprated">Top rated</string>
     <string name="menu_favourites">Favourites</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="menu_share">Share</string>
 
     <string name="format_vote_average"><xliff:g id="vote_average">%.1f/10</xliff:g></string>
     <string name="format_vote_average_short"><xliff:g id="vote_average">%.1f</xliff:g></string>
@@ -30,4 +31,6 @@
     <string name="details_genre">Genre:</string>
 
     <string name="ranking_fragment_tag">tag_ranking</string>
+
+    <string name="share_trailerurl_type">text/plain</string>
 </resources>

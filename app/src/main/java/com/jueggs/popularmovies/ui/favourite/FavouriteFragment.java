@@ -18,9 +18,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider;
-import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
+import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
 
 public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {

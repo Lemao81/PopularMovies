@@ -1,4 +1,4 @@
-package com.jueggs.popularmovies.data.favourites.schematic;
+package com.jueggs.popularmovies.data.favourites;
 
 import net.simonvt.schematic.annotation.Database;
 import net.simonvt.schematic.annotation.Table;

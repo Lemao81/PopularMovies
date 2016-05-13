@@ -1,26 +1,31 @@
 package com.jueggs.popularmovies.ui.detail;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
+import android.telecom.Call;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
+import com.jueggs.popularmovies.adapter.PicassoCallbackAdapter;
+import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.data.repo.ReviewRepository;
 import com.jueggs.popularmovies.data.repo.TrailerRepository;
 import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
+import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -29,7 +34,7 @@ import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
-import static com.jueggs.popularmovies.data.favourites.schematic.FavouritesProvider.*;
+import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
 public class DetailFragment extends Fragment
@@ -53,9 +58,10 @@ public class DetailFragment extends Fragment
     private boolean trailerLoaded;
     private boolean reviewLoaded;
     private boolean isFavourite;
-    private Uri favouriteIdUri;
+    private Uri movieIdUri;
     private ContentResolver contentResolver;
     private SimpleDateFormat dateFormat = new SimpleDateFormat(RELEASE_DATE_PATTERN);
+    private ShareActionProvider actionProvider;
 
     public static DetailFragment createInstance(Movie movie)
     {
@@ -64,6 +70,13 @@ public class DetailFragment extends Fragment
         bundle.putParcelable(ARG_MOVIE, movie);
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -77,9 +90,7 @@ public class DetailFragment extends Fragment
         if (movie == null)
             getActivity().finish();
 
-        loadImage(getContext(), IMG_WIDTH_185, movie.getPosterPath(), thumbnail);
-
-        favouriteIdUri = Favourite.withMovieId(movie.getMovieId());
+        movieIdUri = Favourite.withMovieId(movie.getMovieId());
         contentResolver = getContext().getContentResolver();
 
         bindView(movie);
@@ -114,10 +125,30 @@ public class DetailFragment extends Fragment
         overview.setText(movie.getOverview());
         genre.setText(createGenreString(movie.getGenreIds()));
 
-        isFavourite = contentResolver.query(favouriteIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
+        if (movie.getPoster() == null)
+        {
+            Uri uri = createImageUri(IMG_WIDTH_185, movie.getPosterPath());
+            Picasso.with(getContext()).load(uri).placeholder(R.drawable.picasso_placeholder)
+                    .error(R.drawable.picasso_error).into(thumbnail, picassoCallback);
+        }
+        else
+        {
+            thumbnail.setImageDrawable(convertByteArrayToDrawable(getResources(), movie.getPoster()));
+        }
+
+        isFavourite = contentResolver.query(movieIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
         setStarDrawable(isFavourite);
         favourite.setOnClickListener(addFavouriteClickListener);
     }
+
+    private PicassoCallbackAdapter picassoCallback = new PicassoCallbackAdapter()
+    {
+        @Override
+        public void onSuccess()
+        {
+            movie.setPoster(convertDrawableToByteArray(thumbnail.getDrawable()));
+        }
+    };
 
     private View.OnClickListener addFavouriteClickListener = new View.OnClickListener()
     {
@@ -126,7 +157,7 @@ public class DetailFragment extends Fragment
         {
             if (isFavourite)
             {
-                contentResolver.delete(favouriteIdUri, null, null);
+                contentResolver.delete(movieIdUri, null, null);
                 removeFavourite();
                 Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
             }
@@ -165,6 +196,8 @@ public class DetailFragment extends Fragment
                 case RC_OK_CACHE:
                     if (reviewLoaded)
                         updateTrailerAndReview();
+                    if (actionProvider != null && !isEmpty(trailers))
+                        actionProvider.setShareIntent(createShareIntent());
                     break;
                 case RC_NO_NETWORK:
                     handleFailedUpdate("No network available :(");
@@ -213,6 +246,28 @@ public class DetailFragment extends Fragment
     private void handleFailedUpdate(String message)
     {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.detail_menu, menu);
+
+        actionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_share));
+        if (!isEmpty(trailers))
+            actionProvider.setShareIntent(createShareIntent());
+    }
+
+    private Intent createShareIntent()
+    {
+        String key = trailers.get(0).getKey();
+        String send = TextUtils.isEmpty(key) ? "" : createYoutubeUri(key).toString();
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, send);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType(getString(R.string.share_trailerurl_type));
+        return shareIntent;
     }
 
     @Subscribe

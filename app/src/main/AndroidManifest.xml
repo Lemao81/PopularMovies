@@ -24,7 +24,7 @@
 
         <provider
             android:authorities="com.jueggs.popularmovies"
-            android:name=".data.favourites.schematic.generated.FavouritesProvider" />
+            android:name=".data.favourites.generated.FavouritesProvider" />
     </application>
 
 </manifest>

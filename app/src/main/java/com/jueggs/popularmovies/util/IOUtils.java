@@ -1,6 +1,7 @@
 package com.jueggs.popularmovies.util;
 
 import android.util.Log;
+import com.google.common.io.Files;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
@@ -8,10 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,5 +59,20 @@ public class IOUtils
         return buffer.toString();
     }
 
+    public static File imageBytesToFile(byte[] bytes)
+    {
+        File file = null;
+        try
+        {
+            file = new File("image.jpg");
+            file.createNewFile();
+            Files.write(bytes, file);
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        return file;
+    }
 
 }

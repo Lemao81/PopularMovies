@@ -1,9 +1,7 @@
 package com.jueggs.popularmovies.model;
 
-import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.jueggs.popularmovies.data.favourites.schematic.FavouriteColumns;
 
 import java.util.Date;
 
@@ -23,6 +21,7 @@ public class Movie implements Parcelable
     private boolean adult;
     private String originalTitle;
     private String originalLanguage;
+    private byte[] poster;
 
     public Movie()
     {
@@ -41,6 +40,8 @@ public class Movie implements Parcelable
         adult = in.readByte() != 0;
         originalTitle = in.readString();
         originalLanguage = in.readString();
+        poster = new byte[in.readInt()];
+        in.readByteArray(poster);
     }
 
     @Override
@@ -63,6 +64,8 @@ public class Movie implements Parcelable
         dest.writeByte((byte) (adult ? 1 : 0));
         dest.writeString(originalTitle);
         dest.writeString(originalLanguage);
+        dest.writeInt(poster.length);
+        dest.writeByteArray(poster);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>()
@@ -188,5 +191,15 @@ public class Movie implements Parcelable
     public void setOriginalTitle(String originalTitle)
     {
         this.originalTitle = originalTitle;
+    }
+
+    public byte[] getPoster()
+    {
+        return poster;
+    }
+
+    public void setPoster(byte[] poster)
+    {
+        this.poster = poster;
     }
 }
