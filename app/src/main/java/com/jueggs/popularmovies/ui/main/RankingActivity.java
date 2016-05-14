@@ -14,17 +14,16 @@ import java.util.List;
 
 import static com.jueggs.popularmovies.util.Utils.*;
 
-public class MainActivity extends AppCompatActivity implements Callback.MovieSelected, Callback.MoviesLoaded
+public class RankingActivity extends AppCompatActivity implements Callback.MovieSelected, Callback.MoviesLoaded
 {
-    private boolean startup = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        App.getInstance().setTwoPane(findViewById(R.id.container) != null);
+        if (savedInstanceState == null)
+            App.getInstance().setTwoPane(findViewById(R.id.detail_container) != null);
     }
 
     @Override
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements Callback.MovieSel
     {
         if (App.getInstance().isTwoPane())
         {
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, DetailFragment.createInstance(movie)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
         }
         else
         {
@@ -45,21 +44,18 @@ public class MainActivity extends AppCompatActivity implements Callback.MovieSel
     @Override
     public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
     {
-        if (App.getInstance().isTwoPane() && startup)
-        {
-            Fragment fragment;
-            if (!isEmpty(movies))
-            {
-                fragment = DetailFragment.createInstance(movies.get(0));
-                ((RankingFragment)getSupportFragmentManager().findFragmentByTag(getString(R.string.ranking_fragment_tag))).selectFirstItem();
-            }
-            else
-            {
-                fragment = new AlternativeFragment();
-            }
+        Fragment fragment;
 
-            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
-            startup = false;
+        if (hasElements(movies))
+        {
+            ((RankingFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.ranking_fragment_tag))).selectMovie(0);
+            fragment = DetailFragment.createInstance(movies.get(0));
         }
+        else
+        {
+            fragment = new AlternativeFragment();
+        }
+
+        getSupportFragmentManager().beginTransaction().add(R.id.detail_container, fragment).commit();
     }
 }

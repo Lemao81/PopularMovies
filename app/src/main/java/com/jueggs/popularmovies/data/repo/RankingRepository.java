@@ -38,7 +38,7 @@ public class RankingRepository
 
     public void loadMovies(int sortOrder, Callback.MoviesLoaded callback)
     {
-        if (!isExpired() && !isEmpty(cache.get(sortOrder)))
+        if (!isExpired() && hasElements(cache.get(sortOrder)))
         {
             callback.onMoviesLoaded(Collections.unmodifiableList(cache.get(sortOrder)), sortOrder, RC_OK_CACHE);
         }

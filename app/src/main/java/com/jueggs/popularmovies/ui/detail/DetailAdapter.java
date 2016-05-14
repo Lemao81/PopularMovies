@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.Utils.isEmpty;
+import static com.jueggs.popularmovies.util.Utils.hasElements;
 
 public class DetailAdapter
 {
@@ -88,7 +88,7 @@ public class DetailAdapter
 
         public void createList()
         {
-            if (!isEmpty(items))
+            if (hasElements(items))
             {
                 if (inflater == null)
                     inflater = LayoutInflater.from(context);

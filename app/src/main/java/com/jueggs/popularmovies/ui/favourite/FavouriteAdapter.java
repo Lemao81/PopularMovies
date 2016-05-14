@@ -2,11 +2,13 @@ package com.jueggs.popularmovies.ui.favourite;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
@@ -28,13 +30,23 @@ import static com.jueggs.popularmovies.util.Utils.*;
 
 public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter.ViewHolder> implements Callback.MovieSwiped
 {
+    public static final int NO_SELECTION = -1;
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
     private Callback.MovieSelected callback;
+    private ViewGroup previousSelection;
+    private int selectedPosition;
 
-    public FavouriteAdapter(Context context, Cursor cursor, Callback.MovieSelected callback)
+    public FavouriteAdapter(Context context, Callback.MovieSelected callback, int selectedPosition)
+    {
+        this(context, null, callback, selectedPosition);
+    }
+
+    public FavouriteAdapter(Context context, Cursor cursor, Callback.MovieSelected callback, int selectedPosition)
     {
         super(context, cursor);
         this.callback = callback;
+        this.selectedPosition = selectedPosition;
     }
 
     @Override
@@ -52,9 +64,11 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         holder.release_date.setText(dateFormat.format(new Date(cursor.getLong(REL_DATE))));
         holder.vote_average.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
         holder.itemView.setOnClickListener(holder);
+        if (selectedPosition != NO_SELECTION && selectedPosition == holder.getAdapterPosition())
+            setSelectedMovie(holder.container);
 
         byte[] posterBytes = cursor.getBlob(POSTER);
-        if (!isEmpty(posterBytes))
+        if (hasElements(posterBytes))
             holder.thumbnail.setImageDrawable(convertByteArrayToDrawable(context.getResources(), posterBytes));
         else
             loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
@@ -73,8 +87,17 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
             EventBus.getDefault().post(new FavouriteDeletedEvent(movieId));
     }
 
+    public void setSelectedMovie(ViewGroup container)
+    {
+        container.setBackgroundColor(ContextCompat.getColor(context, R.color.scrim_gridselection));
+        if (previousSelection != null)
+            previousSelection.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+        previousSelection = container;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
+        @Bind(R.id.container) ViewGroup container;
         @Bind(R.id.title) TextView title;
         @Bind(R.id.genre) TextView genre;
         @Bind(R.id.vote_average) TextView vote_average;
@@ -93,7 +116,9 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
             getCursor().moveToPosition(getAdapterPosition());
             Movie movie = transformCurrentCursorPositionToMovie(getCursor());
 
-            callback.onMovieSelected(movie);
+            setSelectedMovie(container);
+
+            callback.onMovieSelected(movie, getAdapterPosition());
         }
     }
 

@@ -17,5 +17,5 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="@integer/detail_fraction"
-        android:id="@+id/container" />
+        android:id="@+id/detail_container" />
 </LinearLayout>

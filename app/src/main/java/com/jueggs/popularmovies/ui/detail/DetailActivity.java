@@ -18,7 +18,7 @@ public class DetailActivity extends AppCompatActivity
 
         setTitle(String.format(getString(R.string.format_title), getString(R.string.title_detail)));
 
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.detail_container);
         if (fragment == null)
         {
             Bundle extras = getIntent().getExtras();
@@ -28,9 +28,15 @@ public class DetailActivity extends AppCompatActivity
                 Movie movie = extras.getParcelable(EXTRA_MOVIE);
                 if (movie != null)
                 {
-                    getSupportFragmentManager().beginTransaction().add(R.id.container, DetailFragment.createInstance(movie)).commit();
+                    getSupportFragmentManager().beginTransaction().add(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
                 }
             }
         }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
     }
 }

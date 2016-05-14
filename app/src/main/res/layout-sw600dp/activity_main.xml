@@ -12,9 +12,9 @@
         android:layout_height="match_parent"
         android:layout_weight="@integer/master_fraction"
         android:tag="@string/ranking_fragment_tag"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_ranking" />
 
-    <FrameLayout android:id="@+id/container"
+    <FrameLayout android:id="@+id/detail_container"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dp"
         android:layout_height="match_parent"

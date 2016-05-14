@@ -15,4 +15,6 @@
     <dimen name="details_voteaverage_textsize">16sp</dimen>
 
     <dimen name="details_star_size">48dp</dimen>
+
+    <dimen name="textsize_nonetwork">30sp</dimen>
 </resources>

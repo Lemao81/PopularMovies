@@ -20,14 +20,27 @@ import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
+import com.jueggs.popularmovies.model.Movie;
 
-public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Callback.MovieSelected
 {
     public static final int LOADER_ID = 0;
+    public static final String STATE_SELECTEDPOSITION = "selectedposition";
 
     @Bind(R.id.recycler) RecyclerView recycler;
 
-    FavouriteAdapter adapter;
+    private FavouriteAdapter adapter;
+    private boolean startup;
+    private int selectedPosition;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        startup = savedInstanceState == null;
+        if (savedInstanceState != null)
+            selectedPosition = savedInstanceState.getInt(STATE_SELECTEDPOSITION);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
@@ -37,7 +50,6 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
@@ -45,7 +57,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), null, (Callback.MovieSelected) getActivity()));
+        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, selectedPosition));
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;
@@ -61,7 +73,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data)
     {
         adapter.swapCursor(data);
-        if (App.getInstance().isTwoPane())
+        if (startup && App.getInstance().isTwoPane())
         {
             new Handler().post(new Runnable()
             {
@@ -75,8 +87,21 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
+    public void onMovieSelected(Movie movie, int position)
+    {
+        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie, position);
+        selectedPosition = position;
+    }
+
+    @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
         adapter.swapCursor(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        outState.putInt(STATE_SELECTEDPOSITION, selectedPosition);
     }
 }

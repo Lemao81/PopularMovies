@@ -7,7 +7,7 @@ public interface Callback
 {
     interface MovieSelected
     {
-        void onMovieSelected(Movie movie);
+        void onMovieSelected(Movie movie, int position);
     }
 
     interface MovieSwiped

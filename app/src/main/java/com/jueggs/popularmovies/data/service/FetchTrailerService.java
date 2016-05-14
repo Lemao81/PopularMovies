@@ -9,6 +9,7 @@ import com.jueggs.popularmovies.ui.detail.Callback;
 
 import java.util.List;
 
+import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.ParseUtils.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
@@ -45,7 +46,7 @@ public class FetchTrailerService
         {
             String jsonString = getJsonData(createTrailerUri(params[0]));
 
-            if (TextUtils.isEmpty(jsonString))
+            if (isEmpty(jsonString))
             {
                 Log.e(TAG, "no useful json string retrieved");
                 return null;

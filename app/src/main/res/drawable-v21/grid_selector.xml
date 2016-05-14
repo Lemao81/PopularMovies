@@ -3,6 +3,6 @@
     <item android:state_pressed="true">
         <ripple android:color="@android:color/black" />
     </item>
-    <item android:state_activated="true" android:drawable="@color/scrim"/>
+    <item android:state_activated="true" android:drawable="@color/scrim_gridselection"/>
     <item android:drawable="@android:color/transparent"/>
 </selector>

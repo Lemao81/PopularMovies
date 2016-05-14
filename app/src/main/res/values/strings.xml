@@ -14,6 +14,10 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_share">Share</string>
 
+    <string name="msg_moviesupdated">Updated movie list</string>
+    <string name="msg_nonetwork">No network available :(</string>
+    <string name="msg_error">An inexplicable error occurred during network access</string>
+
     <string name="format_vote_average"><xliff:g id="vote_average">%.1f/10</xliff:g></string>
     <string name="format_vote_average_short"><xliff:g id="vote_average">%.1f</xliff:g></string>
     <string name="format_trailer_size"><xliff:g id="size">%dp HD</xliff:g></string>
@@ -33,4 +37,6 @@
     <string name="ranking_fragment_tag">tag_ranking</string>
 
     <string name="share_trailerurl_type">text/plain</string>
+
+    <string name="cover_nonetwork">No network connection</string>
 </resources>

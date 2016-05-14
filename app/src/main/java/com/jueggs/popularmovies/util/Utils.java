@@ -39,9 +39,19 @@ public class Utils
         return list == null || list.size() == 0;
     }
 
+    public static <T> boolean hasElements(List<T> list)
+    {
+        return !isEmpty(list);
+    }
+
     public static boolean isEmpty(byte[] array)
     {
         return array == null || array.length == 0;
+    }
+
+    public static boolean hasElements(byte[] array)
+    {
+        return !isEmpty(array);
     }
 
     public static List<Movie> transformCursorToMovies(Cursor cursor)

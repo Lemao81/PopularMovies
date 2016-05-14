@@ -16,8 +16,6 @@ import static com.jueggs.popularmovies.util.Utils.*;
 
 public class FavouriteActivity extends AppCompatActivity implements Callback.MovieSelected, Callback.MoviesLoaded
 {
-    private boolean startup = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -28,11 +26,11 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
     }
 
     @Override
-    public void onMovieSelected(Movie movie)
+    public void onMovieSelected(Movie movie, int position)
     {
         if (App.getInstance().isTwoPane())
         {
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, DetailFragment.createInstance(movie)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
         }
         else
         {
@@ -45,16 +43,12 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
     @Override
     public void onMoviesLoaded(Cursor data)
     {
-        if (App.getInstance().isTwoPane() && startup)
-        {
-            Fragment fragment;
-            if (data.moveToFirst())
-                fragment = DetailFragment.createInstance(transformCurrentCursorPositionToMovie(data));
-            else
-                fragment = new AlternativeFragment();
+        Fragment fragment;
+        if (data.moveToFirst())
+            fragment = DetailFragment.createInstance(transformCurrentCursorPositionToMovie(data));
+        else
+            fragment = new AlternativeFragment();
 
-            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
-            startup = false;
-        }
+        getSupportFragmentManager().beginTransaction().add(R.id.detail_container, fragment).commit();
     }
 }

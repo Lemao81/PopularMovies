@@ -32,6 +32,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
@@ -42,6 +43,7 @@ public class DetailFragment extends Fragment
     public static final String ARG_MOVIE = "ARG_MOVIE";
     public static final String RELEASE_DATE_PATTERN = "MM/yyyy";
     public static final String TAG = DetailFragment.class.getSimpleName();
+    public static final String STATE_MOVIE = "movie";
 
     @Bind(R.id.thumbnail) ImageView thumbnail;
     @Bind(R.id.title) TextView title;
@@ -77,6 +79,16 @@ public class DetailFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if (savedInstanceState != null)
+            movie = savedInstanceState.getParcelable(STATE_MOVIE);
+        else
+            movie = getArguments().getParcelable(ARG_MOVIE);
+        if (movie == null)
+            getActivity().finish();
+
+        movieIdUri = Favourite.withMovieId(movie.getMovieId());
+        contentResolver = getContext().getContentResolver();
     }
 
     @Nullable
@@ -85,13 +97,6 @@ public class DetailFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
-
-        movie = getArguments().getParcelable(ARG_MOVIE);
-        if (movie == null)
-            getActivity().finish();
-
-        movieIdUri = Favourite.withMovieId(movie.getMovieId());
-        contentResolver = getContext().getContentResolver();
 
         bindView(movie);
 
@@ -119,6 +124,15 @@ public class DetailFragment extends Fragment
         favourite.setOnClickListener(addFavouriteClickListener);
     }
 
+    private PicassoCallbackAdapter picassoCallback = new PicassoCallbackAdapter()
+    {
+        @Override
+        public void onSuccess()
+        {
+            movie.setPoster(convertDrawableToByteArray(thumbnail.getDrawable()));
+        }
+    };
+
     @Override
     public void onStart()
     {
@@ -134,15 +148,6 @@ public class DetailFragment extends Fragment
         if (App.getInstance().isTwoPane())
             EventBus.getDefault().unregister(this);
     }
-
-    private PicassoCallbackAdapter picassoCallback = new PicassoCallbackAdapter()
-    {
-        @Override
-        public void onSuccess()
-        {
-            movie.setPoster(convertDrawableToByteArray(thumbnail.getDrawable()));
-        }
-    };
 
     private View.OnClickListener addFavouriteClickListener = new View.OnClickListener()
     {
@@ -190,7 +195,7 @@ public class DetailFragment extends Fragment
                 case RC_OK_CACHE:
                     if (reviewLoaded)
                         updateTrailerAndReview();
-                    if (actionProvider != null && !isEmpty(trailers))
+                    if (actionProvider != null && hasElements(trailers))
                         actionProvider.setShareIntent(createShareIntent());
                     break;
                 case RC_NO_NETWORK:
@@ -248,14 +253,14 @@ public class DetailFragment extends Fragment
         inflater.inflate(R.menu.detail_menu, menu);
 
         actionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_share));
-        if (!isEmpty(trailers))
+        if (hasElements(trailers))
             actionProvider.setShareIntent(createShareIntent());
     }
 
     private Intent createShareIntent()
     {
         String key = trailers.get(0).getKey();
-        String send = TextUtils.isEmpty(key) ? "" : createYoutubeUri(key).toString();
+        String send = isEmpty(key) ? "" : createYoutubeUri(key).toString();
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, send);
@@ -272,4 +277,15 @@ public class DetailFragment extends Fragment
             removeFavourite();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        outState.putParcelable(STATE_MOVIE, movie);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+    }
 }
