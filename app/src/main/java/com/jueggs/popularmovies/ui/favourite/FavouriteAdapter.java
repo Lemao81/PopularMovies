@@ -36,17 +36,14 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     private Callback.MovieSelected callback;
     private ViewGroup previousSelection;
     private int selectedPosition;
+    private RecyclerView recycler;
 
-    public FavouriteAdapter(Context context, Callback.MovieSelected callback, int selectedPosition)
+    public FavouriteAdapter(Context context, Callback.MovieSelected callback, int selectedPosition, RecyclerView recycler)
     {
-        this(context, null, callback, selectedPosition);
-    }
-
-    public FavouriteAdapter(Context context, Cursor cursor, Callback.MovieSelected callback, int selectedPosition)
-    {
-        super(context, cursor);
+        super(context, null);
         this.callback = callback;
         this.selectedPosition = selectedPosition;
+        this.recycler = recycler;
     }
 
     @Override
@@ -64,8 +61,12 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         holder.release_date.setText(dateFormat.format(new Date(cursor.getLong(REL_DATE))));
         holder.vote_average.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
         holder.itemView.setOnClickListener(holder);
+
         if (selectedPosition != NO_SELECTION && selectedPosition == holder.getAdapterPosition())
+        {
             setSelectedMovie(holder.container);
+            recycler.smoothScrollToPosition(selectedPosition);
+        }
 
         byte[] posterBytes = cursor.getBlob(POSTER);
         if (hasElements(posterBytes))
@@ -77,10 +78,13 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     @Override
     public void onMovieSwiped(int position)
     {
+//        if (selectedPosition == position)
+//            selectedPosition = NO_SELECTION;
         Cursor cursor = getCursor();
         cursor.moveToPosition(position);
         int movieId = cursor.getInt(MOVIE_ID);
         context.getContentResolver().delete(Favourite.withMovieId(movieId), null, null);
+
         Toast.makeText(context, R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
 
         if (App.getInstance().isTwoPane())
@@ -116,7 +120,11 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
             getCursor().moveToPosition(getAdapterPosition());
             Movie movie = transformCurrentCursorPositionToMovie(getCursor());
 
-            setSelectedMovie(container);
+            if (previousSelection != container)
+            {
+                selectedPosition = getAdapterPosition();
+                setSelectedMovie(container);
+            }
 
             callback.onMovieSelected(movie, getAdapterPosition());
         }

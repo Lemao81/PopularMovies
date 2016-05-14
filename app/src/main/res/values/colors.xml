@@ -15,4 +15,5 @@
     <color name="scrim_buttonpressed">#55424242</color>
 
     <color name="scrim_background">#55292929</color>
+    <color name="scrim_background_light">#55434343</color>
 </resources>

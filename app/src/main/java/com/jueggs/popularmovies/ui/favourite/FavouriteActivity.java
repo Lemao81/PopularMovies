@@ -49,6 +49,6 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
         else
             fragment = new AlternativeFragment();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.detail_container, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, fragment).commit();
     }
 }

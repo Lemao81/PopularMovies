@@ -57,7 +57,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, selectedPosition));
+        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, selectedPosition, recycler));
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;

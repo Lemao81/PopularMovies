@@ -16,4 +16,9 @@ public interface Callback
     {
         void onReviewsLoaded(List<Review> reviews, int resultCode);
     }
+
+    interface FavouriteCRUD
+    {
+        void onFavouriteCRUDcompleted();
+    }
 }

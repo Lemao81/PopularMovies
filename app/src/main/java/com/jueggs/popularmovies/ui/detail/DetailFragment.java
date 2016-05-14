@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.telecom.Call;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -25,7 +23,6 @@ import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
-import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -53,6 +50,7 @@ public class DetailFragment extends Fragment
     @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
     @Bind(R.id.favourite) ImageButton favourite;
     @Bind(R.id.genre) TextView genre;
+    @Bind(R.id.loading) FrameLayout loading;
 
     private Movie movie;
     private List<Trailer> trailers;
@@ -91,7 +89,6 @@ public class DetailFragment extends Fragment
         contentResolver = getContext().getContentResolver();
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
@@ -154,19 +151,29 @@ public class DetailFragment extends Fragment
         @Override
         public void onClick(View v)
         {
+            showLoading(true);
             if (isFavourite)
             {
-                contentResolver.delete(movieIdUri, null, null);
+                new DeleteFavouriteTask(favouriteCRUDcallback, contentResolver).execute(movieIdUri);
                 removeFavourite();
-                Toast.makeText(getContext(), R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
+                showToast(R.string.favourites_removed_msg);
             }
             else
             {
-                contentResolver.insert(Favourite.BASE_URI, transformMovieToContentValues(movie));
+                new InsertFavouriteTask(favouriteCRUDcallback, contentResolver).execute(movie);
                 setStarDrawable(true);
                 isFavourite = true;
-                Toast.makeText(getContext(), R.string.favourites_added_msg, Toast.LENGTH_LONG).show();
+                showToast(R.string.favourites_added_msg);
             }
+        }
+    };
+
+    private Callback.FavouriteCRUD favouriteCRUDcallback = new Callback.FavouriteCRUD()
+    {
+        @Override
+        public void onFavouriteCRUDcompleted()
+        {
+            showLoading(false);
         }
     };
 
@@ -179,6 +186,11 @@ public class DetailFragment extends Fragment
     private void setStarDrawable(boolean checked)
     {
         favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
+    }
+
+    private void showLoading(boolean show)
+    {
+        loading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
@@ -199,10 +211,10 @@ public class DetailFragment extends Fragment
                         actionProvider.setShareIntent(createShareIntent());
                     break;
                 case RC_NO_NETWORK:
-                    handleFailedUpdate("No network available :(");
+                    showToast(R.string.msg_nonetwork);
                     break;
                 case RC_ERROR:
-                    handleFailedUpdate("An inexplicable error occurred during network access to fetch trailer");
+                    showToast(R.string.msg_error);
                     break;
                 default:
                     Log.e(TAG, "unknown result code");
@@ -228,7 +240,7 @@ public class DetailFragment extends Fragment
                 case RC_NO_NETWORK:
                     break;
                 case RC_ERROR:
-                    handleFailedUpdate("An inexplicable error occurred during network access to fetch reviews");
+                    showToast(R.string.msg_error);
                     break;
                 default:
                     Log.e(TAG, "unknown result code");
@@ -240,11 +252,6 @@ public class DetailFragment extends Fragment
     {
         DetailAdapter adapter = new DetailAdapter(trailerReviewContainer, getContext(), trailers, reviews);
         adapter.createViews();
-    }
-
-    private void handleFailedUpdate(String message)
-    {
-        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -283,9 +290,8 @@ public class DetailFragment extends Fragment
         outState.putParcelable(STATE_MOVIE, movie);
     }
 
-    @Override
-    public void onDestroy()
+    private void showToast(int stringId)
     {
-        super.onDestroy();
+        Toast.makeText(getContext(), stringId, Toast.LENGTH_SHORT).show();
     }
 }

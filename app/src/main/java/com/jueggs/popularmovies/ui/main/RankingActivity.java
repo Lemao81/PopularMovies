@@ -56,6 +56,6 @@ public class RankingActivity extends AppCompatActivity implements Callback.Movie
             fragment = new AlternativeFragment();
         }
 
-        getSupportFragmentManager().beginTransaction().add(R.id.detail_container, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, fragment).commit();
     }
 }

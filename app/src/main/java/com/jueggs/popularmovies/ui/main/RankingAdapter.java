@@ -31,13 +31,26 @@ public class RankingAdapter extends ArrayAdapter<Movie>
     public View getView(int position, View convertView, ViewGroup parent)
     {
         if (convertView == null)
+        {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.griditem_movie, parent, false);
+            convertView.setTag(new ViewHolder(convertView));
+        }
 
+        ViewHolder holder = (ViewHolder) convertView.getTag();
         Movie movie = getItem(position);
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.poster);
 
-        loadImage(getContext(), IMG_WIDTH_185, movie.getPosterPath(), imageView);
+        loadImage(getContext(), IMG_WIDTH_185, movie.getPosterPath(), holder.image);
 
         return convertView;
+    }
+
+    class ViewHolder
+    {
+        ImageView image;
+
+        public ViewHolder(View view)
+        {
+            image = (ImageView) view.findViewById(R.id.poster);
+        }
     }
 }
