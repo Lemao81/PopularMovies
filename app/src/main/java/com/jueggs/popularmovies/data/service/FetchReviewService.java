@@ -7,6 +7,7 @@ import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
 import com.jueggs.popularmovies.ui.detail.Callback;
+import com.jueggs.popularmovies.util.Utils;
 
 import java.util.List;
 
@@ -61,9 +62,7 @@ public class FetchReviewService
         {
             if (callback != null)
                 if (reviews != null)
-                {
                     callback.onReviewsLoaded(reviews, RC_OK_NETWORK);
-                }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");

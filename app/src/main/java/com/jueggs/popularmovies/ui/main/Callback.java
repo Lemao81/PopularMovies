@@ -15,4 +15,9 @@ public interface Callback
     {
         void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode);
     }
+
+    interface StartLoadingMovies
+    {
+        void onLoadingMoviesStarted();
+    }
 }

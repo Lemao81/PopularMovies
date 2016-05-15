@@ -2,6 +2,7 @@ package com.jueggs.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.jueggs.popularmovies.util.Utils;
 
 import java.util.Date;
 
@@ -23,8 +24,27 @@ public class Movie implements Parcelable
     private String originalLanguage;
     private byte[] poster = new byte[0];
 
+    @Override
+    public boolean equals(Object other)
+    {
+        if(!(other instanceof Movie))
+            return false;
+        Movie o = (Movie) other;
+        return dbId == o.dbId && movieId == o.movieId && title.equals(o.title) && releaseDate.getTime() == o.releaseDate.getTime() &&
+                posterPath.equals(o.posterPath) && voteAverage == o.voteAverage && overview.equals(o.overview) &&
+                Utils.encodeGenreIds(genreIds) == Utils.encodeGenreIds(o.genreIds) && adult == o.adult && originalTitle.equals(o.originalTitle) &&
+                originalLanguage.equals(o.originalLanguage) && poster.equals(o.poster);
+    }
+
     public Movie()
     {
+    }
+
+    public Movie(long dbId, boolean adult, int[] genreIds, int movieId, String originalLanguage, String originalTitle,
+                 String overview, byte[] poster, String posterPath, Date releaseDate, String title, float voteAverage)
+    {
+        this(adult, genreIds, movieId, originalLanguage, originalTitle, overview, poster, posterPath, releaseDate, title, voteAverage);
+        this.dbId = dbId;
     }
 
     public Movie(boolean adult, int[] genreIds, int movieId, String originalLanguage, String originalTitle,
@@ -98,6 +118,8 @@ public class Movie implements Parcelable
             return new Movie[size];
         }
     };
+
+
 
     public long getDbId()
     {

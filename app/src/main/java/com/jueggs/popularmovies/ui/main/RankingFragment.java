@@ -19,7 +19,6 @@ import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.event.NetworkStateChangeEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
-import com.jueggs.popularmovies.util.NetUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -38,13 +37,14 @@ public class RankingFragment extends Fragment
 
     @Bind(R.id.gridView) GridView gridView;
     @Bind(R.id.coverNoNetwork) FrameLayout coverNoNetwork;
+    @Bind(R.id.coverLoading) FrameLayout coverLoading;
 
     private RankingAdapter rankingAdapter;
     private RankingRepository repository;
     private int sortOrder = SORTORDER_POPULAR;
     private int selectedPosition = 0;
     private boolean startup;
-    private boolean connected;
+    private boolean networkAvailable;
     private SparseArray<String> titles = new SparseArray<>(NUM_SORTORDER);
 
     @Override
@@ -56,8 +56,8 @@ public class RankingFragment extends Fragment
         titles.put(SORTORDER_POPULAR, getString(R.string.title_popular));
         titles.put(SORTORDER_TOPRATED, getString(R.string.title_toprated));
 
-        connected = isNetworkAvailable(getContext());
-        if (!connected)
+        networkAvailable = isNetworkAvailable(getContext());
+        if (!networkAvailable)
             enableNetworkChangeReceiver(getContext(), true);
 
         startup = savedInstanceState == null;
@@ -77,7 +77,7 @@ public class RankingFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_ranking, container, false);
         ButterKnife.bind(this, view);
 
-        if (!connected)
+        if (!networkAvailable)
             coverNoNetwork.setVisibility(View.VISIBLE);
 
         rankingAdapter = new RankingAdapter(getContext(), new ArrayList<Movie>());
@@ -102,8 +102,22 @@ public class RankingFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        if (connected)
-            repository.loadMovies(sortOrder, moviesLoadedCallback);
+        if (networkAvailable)
+            repository.loadMovies(sortOrder, moviesLoadedCallback, startLoadingCallback);
+    }
+
+    private Callback.StartLoadingMovies startLoadingCallback = new Callback.StartLoadingMovies()
+    {
+        @Override
+        public void onLoadingMoviesStarted()
+        {
+            showLoading(true);
+        }
+    };
+
+    private void showLoading(boolean show)
+    {
+        coverLoading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
@@ -111,6 +125,8 @@ public class RankingFragment extends Fragment
         @Override
         public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
         {
+            showLoading(false);
+
             switch (resultCode)
             {
                 case RC_OK_NETWORK:
@@ -127,6 +143,7 @@ public class RankingFragment extends Fragment
                 default:
                     Log.e(TAG, "unknown result code");
             }
+
             if (startup && App.getInstance().isTwoPane())
                 ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(movies, sortOrder, resultCode);
         }
@@ -185,7 +202,7 @@ public class RankingFragment extends Fragment
         {
             enableNetworkChangeReceiver(getContext(), false);
             coverNoNetwork.setVisibility(View.GONE);
-            repository.loadMovies(sortOrder, moviesLoadedCallback);
+            repository.loadMovies(sortOrder, moviesLoadedCallback,startLoadingCallback);
         }
     }
 
@@ -198,7 +215,7 @@ public class RankingFragment extends Fragment
     @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
-        menu.findItem(R.id.menu_refresh).setEnabled(connected);
+        menu.findItem(R.id.menu_refresh).setEnabled(networkAvailable);
     }
 
     @Override
@@ -213,14 +230,14 @@ public class RankingFragment extends Fragment
         switch (item.getItemId())
         {
             case R.id.menu_popular:
-                repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback);
+                repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback, startLoadingCallback);
                 break;
             case R.id.menu_toprated:
-                repository.loadMovies(SORTORDER_TOPRATED, moviesLoadedCallback);
+                repository.loadMovies(SORTORDER_TOPRATED, moviesLoadedCallback,startLoadingCallback);
                 break;
             case R.id.menu_refresh:
                 repository.clear(sortOrder);
-                repository.loadMovies(sortOrder, moviesLoadedCallback);
+                repository.loadMovies(sortOrder, moviesLoadedCallback,startLoadingCallback);
                 break;
             case R.id.menu_favourites:
                 startActivity(new Intent(getContext(), FavouriteActivity.class));

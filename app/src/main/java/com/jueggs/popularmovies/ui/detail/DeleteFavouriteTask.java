@@ -7,12 +7,21 @@ import android.os.AsyncTask;
 public class DeleteFavouriteTask extends AsyncTask<Uri,Void,Void>
 {
     private ContentResolver contentResolver;
-    private Callback.FavouriteCRUD callback;
+    private Callback.FavouriteCRUDstarted startedCallback;
+    private Callback.FavouriteCRUDcompleted completedCallback;
 
-    public DeleteFavouriteTask(Callback.FavouriteCRUD callback, ContentResolver contentResolver)
+    public DeleteFavouriteTask(Callback.FavouriteCRUDstarted startedCallback, Callback.FavouriteCRUDcompleted completedCallback,
+                               ContentResolver contentResolver)
     {
-        this.callback = callback;
+        this.startedCallback = startedCallback;
+        this.completedCallback = completedCallback;
         this.contentResolver = contentResolver;
+    }
+
+    @Override
+    protected void onPreExecute()
+    {
+        startedCallback.onFavouriteCRUDstarted();
     }
 
     @Override
@@ -25,6 +34,6 @@ public class DeleteFavouriteTask extends AsyncTask<Uri,Void,Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        callback.onFavouriteCRUDcompleted();
+        completedCallback.onFavouriteCRUDcompleted();
     }
 }

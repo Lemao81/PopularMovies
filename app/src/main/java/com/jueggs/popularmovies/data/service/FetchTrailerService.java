@@ -6,6 +6,7 @@ import android.util.Log;
 import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Trailer;
 import com.jueggs.popularmovies.ui.detail.Callback;
+import com.jueggs.popularmovies.util.Utils;
 
 import java.util.List;
 
@@ -60,9 +61,7 @@ public class FetchTrailerService
         {
             if (callback != null)
                 if (trailers != null)
-                {
                     callback.onTrailerLoaded(trailers, RC_OK_NETWORK);
-                }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");

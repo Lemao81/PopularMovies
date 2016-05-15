@@ -6,9 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:name=".App"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -19,12 +19,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.detail.DetailActivity" />
-        <activity android:name=".ui.favourite.FavouriteActivity" />
+        <activity
+            android:name=".ui.detail.DetailActivity"
+            android:parentActivityName=".ui.main.RankingActivity" />
+        <activity
+            android:name=".ui.favourite.FavouriteActivity"
+            android:parentActivityName=".ui.main.RankingActivity" />
 
         <provider
-            android:authorities="com.jueggs.popularmovies"
-            android:name=".data.favourites.generated.FavouritesProvider" />
+            android:name=".data.favourites.generated.FavouritesProvider"
+            android:authorities="com.jueggs.popularmovies" />
 
         <receiver android:name=".receiver.NetworkChangeReceiver">
             <intent-filter>

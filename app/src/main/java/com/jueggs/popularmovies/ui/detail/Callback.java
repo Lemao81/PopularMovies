@@ -7,9 +7,19 @@ import java.util.List;
 
 public interface Callback
 {
+    interface StartLoadingTrailer
+    {
+        void onLoadingTrailerStarted();
+    }
+
     interface TrailerLoaded
     {
         void onTrailerLoaded(List<Trailer> trailers, int resultCode);
+    }
+
+    interface StartLoadingReviews
+    {
+        void onLoadingReviewsStarted();
     }
 
     interface ReviewsLoaded
@@ -17,8 +27,14 @@ public interface Callback
         void onReviewsLoaded(List<Review> reviews, int resultCode);
     }
 
-    interface FavouriteCRUD
+    interface FavouriteCRUDstarted
+    {
+        void onFavouriteCRUDstarted();
+    }
+
+    interface FavouriteCRUDcompleted
     {
         void onFavouriteCRUDcompleted();
+
     }
 }

@@ -75,6 +75,7 @@ public class Utils
                 movie.setAdult(cursor.getInt(ADULT) > 0);
                 movie.setOriginalTitle(cursor.getString(ORIG_TITLE));
                 movie.setOriginalLanguage(cursor.getString(ORIG_LANG));
+                movie.setPoster(cursor.getBlob(POSTER));
 
                 movies.add(movie);
             } while (cursor.moveToNext());
@@ -185,5 +186,17 @@ public class Utils
     {
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         return new BitmapDrawable(resources, bitmap);
+    }
+
+    public static void sleepSafely(long ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

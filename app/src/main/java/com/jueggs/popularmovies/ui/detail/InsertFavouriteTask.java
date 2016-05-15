@@ -10,12 +10,20 @@ import static com.jueggs.popularmovies.util.Utils.transformMovieToContentValues;
 public class InsertFavouriteTask extends AsyncTask<Movie,Void,Void>
 {
     private ContentResolver contentResolver;
-    private Callback.FavouriteCRUD callback;
+    private Callback.FavouriteCRUDstarted startedCallback;
+    private Callback.FavouriteCRUDcompleted completedCallback;
 
-    public InsertFavouriteTask(Callback.FavouriteCRUD callback, ContentResolver contentResolver)
+    public InsertFavouriteTask(Callback.FavouriteCRUDstarted startedCallback, Callback.FavouriteCRUDcompleted completedCallback, ContentResolver contentResolver)
     {
-        this.callback = callback;
+        this.startedCallback = startedCallback;
+        this.completedCallback = completedCallback;
         this.contentResolver = contentResolver;
+    }
+
+    @Override
+    protected void onPreExecute()
+    {
+        startedCallback.onFavouriteCRUDstarted();
     }
 
     @Override
@@ -28,6 +36,6 @@ public class InsertFavouriteTask extends AsyncTask<Movie,Void,Void>
     @Override
     protected void onPostExecute(Void aVoid)
     {
-        callback.onFavouriteCRUDcompleted();
+        completedCallback.onFavouriteCRUDcompleted();
     }
 }

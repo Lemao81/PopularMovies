@@ -36,23 +36,21 @@ public class RankingRepository
         this.context = context;
     }
 
-    public void loadMovies(int sortOrder, Callback.MoviesLoaded callback)
+    public void loadMovies(int sortOrder, Callback.MoviesLoaded moviesLoadedCallback,Callback.StartLoadingMovies startLoadingCallback)
     {
+        startLoadingCallback.onLoadingMoviesStarted();
+
         if (!isExpired() && hasElements(cache.get(sortOrder)))
-        {
-            callback.onMoviesLoaded(Collections.unmodifiableList(cache.get(sortOrder)), sortOrder, RC_OK_CACHE);
-        }
+            moviesLoadedCallback.onMoviesLoaded(Collections.unmodifiableList(cache.get(sortOrder)), sortOrder, RC_OK_CACHE);
         else
         {
             if (isNetworkAvailable(context))
             {
-                this.callback = callback;
-                service.fetchMovies(sortOrder, moviesLoadedCallback);
+                this.callback = moviesLoadedCallback;
+                service.fetchMovies(sortOrder, this.moviesLoadedCallback);
             }
             else
-            {
-                callback.onMoviesLoaded(null, sortOrder, RC_NO_NETWORK);
-            }
+                moviesLoadedCallback.onMoviesLoaded(null, sortOrder, RC_NO_NETWORK);
         }
     }
 

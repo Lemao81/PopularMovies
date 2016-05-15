@@ -27,16 +27,8 @@ public class DetailActivity extends AppCompatActivity
             {
                 Movie movie = extras.getParcelable(EXTRA_MOVIE);
                 if (movie != null)
-                {
                     getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
-                }
             }
         }
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
     }
 }

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.main.Callback;
+import com.jueggs.popularmovies.util.Utils;
 
 import java.util.List;
 
@@ -56,9 +57,7 @@ public class FetchRankingService implements RankingService
         {
             if (callback != null)
                 if (movies != null)
-                {
                     callback.onMoviesLoaded(movies, sortOrder, RC_OK_NETWORK);
-                }
                 else
                 {
                     Log.e(TAG, "something went wrong during fetching, returned null");
@@ -71,9 +70,7 @@ public class FetchRankingService implements RankingService
     public static FetchRankingService getInstance()
     {
         if (instance == null)
-        {
             instance = new FetchRankingService();
-        }
         return instance;
     }
 }

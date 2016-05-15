@@ -24,23 +24,25 @@ public class TrailerRepository
     private Callback.TrailerLoaded callback;
     private int movieId;
 
-    public void loadTrailers(int movieId, Callback.TrailerLoaded callback)
+    public void loadTrailers(int movieId,Callback.StartLoadingTrailer startLoadingCallback, Callback.TrailerLoaded trailerLoadedCallback)
     {
+        startLoadingCallback.onLoadingTrailerStarted();
+
         if (cache.get(movieId) != null)
         {
-            callback.onTrailerLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
+            trailerLoadedCallback.onTrailerLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
         }
         else
         {
             if (isNetworkAvailable(context))
             {
-                this.callback = callback;
+                this.callback = trailerLoadedCallback;
                 this.movieId = movieId;
-                service.fetchTrailers(movieId, trailerLoadedCallback);
+                service.fetchTrailers(movieId, this.trailerLoadedCallback);
             }
             else
             {
-                callback.onTrailerLoaded(null, RC_NO_NETWORK);
+                trailerLoadedCallback.onTrailerLoaded(null, RC_NO_NETWORK);
             }
         }
     }

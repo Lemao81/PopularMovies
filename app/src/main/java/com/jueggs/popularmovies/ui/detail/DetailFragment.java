@@ -50,7 +50,7 @@ public class DetailFragment extends Fragment
     @Bind(R.id.trailerReviewContainer) LinearLayout trailerReviewContainer;
     @Bind(R.id.favourite) ImageButton favourite;
     @Bind(R.id.genre) TextView genre;
-    @Bind(R.id.loading) FrameLayout loading;
+    @Bind(R.id.coverLoading) FrameLayout coverLoading;
 
     private Movie movie;
     private List<Trailer> trailers;
@@ -97,9 +97,6 @@ public class DetailFragment extends Fragment
 
         bindView(movie);
 
-        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), trailerLoadedCallback);
-        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), reviewLoadedCallback);
-
         return view;
     }
 
@@ -131,6 +128,13 @@ public class DetailFragment extends Fragment
     };
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), startLoadingTrailerCallback, trailerLoadedCallback);
+        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), startLoadingReviewsCallback, reviewLoadedCallback);
+    }
+
+    @Override
     public void onStart()
     {
         super.onStart();
@@ -151,16 +155,15 @@ public class DetailFragment extends Fragment
         @Override
         public void onClick(View v)
         {
-            showLoading(true);
             if (isFavourite)
             {
-                new DeleteFavouriteTask(favouriteCRUDcallback, contentResolver).execute(movieIdUri);
+                new DeleteFavouriteTask(CRUDstartedCallback, CRUDcompletedCallback, contentResolver).execute(movieIdUri);
                 removeFavourite();
                 showToast(R.string.favourites_removed_msg);
             }
             else
             {
-                new InsertFavouriteTask(favouriteCRUDcallback, contentResolver).execute(movie);
+                new InsertFavouriteTask(CRUDstartedCallback, CRUDcompletedCallback, contentResolver).execute(movie);
                 setStarDrawable(true);
                 isFavourite = true;
                 showToast(R.string.favourites_added_msg);
@@ -168,7 +171,16 @@ public class DetailFragment extends Fragment
         }
     };
 
-    private Callback.FavouriteCRUD favouriteCRUDcallback = new Callback.FavouriteCRUD()
+    private Callback.FavouriteCRUDstarted CRUDstartedCallback = new Callback.FavouriteCRUDstarted()
+    {
+        @Override
+        public void onFavouriteCRUDstarted()
+        {
+            showLoading(true);
+        }
+    };
+
+    private Callback.FavouriteCRUDcompleted CRUDcompletedCallback = new Callback.FavouriteCRUDcompleted()
     {
         @Override
         public void onFavouriteCRUDcompleted()
@@ -190,8 +202,17 @@ public class DetailFragment extends Fragment
 
     private void showLoading(boolean show)
     {
-        loading.setVisibility(show ? View.VISIBLE : View.GONE);
+        coverLoading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
+
+    private Callback.StartLoadingTrailer startLoadingTrailerCallback = new Callback.StartLoadingTrailer()
+    {
+        @Override
+        public void onLoadingTrailerStarted()
+        {
+            showLoading(true);
+        }
+    };
 
     private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
     {
@@ -200,6 +221,8 @@ public class DetailFragment extends Fragment
         {
             DetailFragment.this.trailers = trailers;
             trailerLoaded = true;
+            if (reviewLoaded)
+                showLoading(false);
 
             switch (resultCode)
             {
@@ -222,6 +245,15 @@ public class DetailFragment extends Fragment
         }
     };
 
+    private Callback.StartLoadingReviews startLoadingReviewsCallback = new Callback.StartLoadingReviews()
+    {
+        @Override
+        public void onLoadingReviewsStarted()
+        {
+            showLoading(true);
+        }
+    };
+
     private Callback.ReviewsLoaded reviewLoadedCallback = new Callback.ReviewsLoaded()
     {
         @Override
@@ -229,6 +261,8 @@ public class DetailFragment extends Fragment
         {
             DetailFragment.this.reviews = reviews;
             reviewLoaded = true;
+            if (trailerLoaded)
+                showLoading(false);
 
             switch (resultCode)
             {
@@ -274,6 +308,17 @@ public class DetailFragment extends Fragment
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType(getString(R.string.share_trailerurl_type));
         return shareIntent;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home && getActivity() instanceof DetailActivity)
+        {
+            getActivity().finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Subscribe
