@@ -33,6 +33,7 @@ import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
+import static com.jueggs.popularmovies.util.UIUtils.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
 public class DetailFragment extends Fragment
@@ -156,36 +157,52 @@ public class DetailFragment extends Fragment
         public void onClick(View v)
         {
             if (isFavourite)
-            {
-                new DeleteFavouriteTask(CRUDstartedCallback, CRUDcompletedCallback, contentResolver).execute(movieIdUri);
-                removeFavourite();
-                showToast(R.string.favourites_removed_msg);
-            }
+                new DeleteFavouriteTask(crudStartedCallback, crudCompletedCallback, contentResolver).execute(movieIdUri);
             else
-            {
-                new InsertFavouriteTask(CRUDstartedCallback, CRUDcompletedCallback, contentResolver).execute(movie);
-                setStarDrawable(true);
-                isFavourite = true;
-                showToast(R.string.favourites_added_msg);
-            }
+                new InsertFavouriteTask(crudStartedCallback, crudCompletedCallback, contentResolver).execute(movie);
         }
     };
 
-    private Callback.FavouriteCRUDstarted CRUDstartedCallback = new Callback.FavouriteCRUDstarted()
+    private Callback.FavouriteCRUDstarted crudStartedCallback = new Callback.FavouriteCRUDstarted()
     {
         @Override
         public void onFavouriteCRUDstarted()
         {
-            showLoading(true);
+            showLoading(true, coverLoading);
         }
     };
 
-    private Callback.FavouriteCRUDcompleted CRUDcompletedCallback = new Callback.FavouriteCRUDcompleted()
+    private Callback.FavouriteCRUDcompleted crudCompletedCallback = new Callback.FavouriteCRUDcompleted()
     {
         @Override
-        public void onFavouriteCRUDcompleted()
+        public void onFavouriteCRUDcompleted(int result, Callback.CRUD operation)
         {
-            showLoading(false);
+            showLoading(false, coverLoading);
+
+            int stringId = R.string.empty;
+            switch (operation)
+            {
+                case INSERT:
+                    if (result != -1)
+                    {
+                        stringId = R.string.favourites_added_msg;
+                        setStarDrawable(true);
+                        isFavourite = true;
+                    }
+                    else
+                        stringId = R.string.favourites_added_error;
+                    break;
+                case DELETE:
+                    if (result > 0)
+                    {
+                        stringId = R.string.favourites_removed_msg;
+                        removeFavourite();
+                    }
+                    else
+                        stringId = R.string.favourites_removed_error;
+                    break;
+            }
+            showToast(stringId);
         }
     };
 
@@ -200,17 +217,12 @@ public class DetailFragment extends Fragment
         favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
     }
 
-    private void showLoading(boolean show)
-    {
-        coverLoading.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
     private Callback.StartLoadingTrailer startLoadingTrailerCallback = new Callback.StartLoadingTrailer()
     {
         @Override
         public void onLoadingTrailerStarted()
         {
-            showLoading(true);
+            showLoading(true, coverLoading);
         }
     };
 
@@ -222,7 +234,7 @@ public class DetailFragment extends Fragment
             DetailFragment.this.trailers = trailers;
             trailerLoaded = true;
             if (reviewLoaded)
-                showLoading(false);
+                showLoading(false, coverLoading);
 
             switch (resultCode)
             {
@@ -250,7 +262,7 @@ public class DetailFragment extends Fragment
         @Override
         public void onLoadingReviewsStarted()
         {
-            showLoading(true);
+            showLoading(true, coverLoading);
         }
     };
 
@@ -262,7 +274,7 @@ public class DetailFragment extends Fragment
             DetailFragment.this.reviews = reviews;
             reviewLoaded = true;
             if (trailerLoaded)
-                showLoading(false);
+                showLoading(false, coverLoading);
 
             switch (resultCode)
             {

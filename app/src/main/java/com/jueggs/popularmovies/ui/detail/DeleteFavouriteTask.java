@@ -4,7 +4,7 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-public class DeleteFavouriteTask extends AsyncTask<Uri,Void,Void>
+public class DeleteFavouriteTask extends AsyncTask<Uri, Void, Integer>
 {
     private ContentResolver contentResolver;
     private Callback.FavouriteCRUDstarted startedCallback;
@@ -25,15 +25,14 @@ public class DeleteFavouriteTask extends AsyncTask<Uri,Void,Void>
     }
 
     @Override
-    protected Void doInBackground(Uri... params)
+    protected Integer doInBackground(Uri... params)
     {
-        contentResolver.delete(params[0], null, null);
-        return null;
+        return contentResolver.delete(params[0], null, null);
     }
 
     @Override
-    protected void onPostExecute(Void aVoid)
+    protected void onPostExecute(Integer num)
     {
-        completedCallback.onFavouriteCRUDcompleted();
+        completedCallback.onFavouriteCRUDcompleted(num, Callback.CRUD.DELETE);
     }
 }

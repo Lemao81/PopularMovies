@@ -10,7 +10,7 @@
 
     <color name="dark_grey">#616161</color>
 
-    <color name="scrim_gridselection">#55BDBDBD</color>
+    <color name="scrim_item_selection">#55BDBDBD</color>
 
     <color name="scrim_buttonpressed">#55424242</color>
 

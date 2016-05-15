@@ -29,8 +29,11 @@
     <string name="details_overview_placeholder" translatable="false">After the cataclysmic events in New York with The Avengers, Steve Rogers, aka Captain America is living quietly in Washington, D.C. and trying to adjust to the modern world. But when a S.H.I.E.L.D. colleague comes under attack, Steve becomes embroiled in a web of intrigue that threatens to put the world at risk. Joining forces with the Black Widow, Captain America struggles to expose the ever-widening conspiracy while fighting off professional assassins sent to silence him at every turn. When the full scope of the villainous plot is revealed, Captain America and the Black Widow enlist the help of a new ally, the Falcon. However, they soon find themselves up against an unexpected and formidable enemy—the Winter Soldier.</string>
     <string name="review_placeholder" translatable="false">Well another super-sized Marvel Comics superhero saga hits the big screen with the selected savior Captain America taking the top billing on the marquee. Thus, the pulsating popcorn pleaser **Captain America: Civil War** arrives on the scene to giddy audiences that have been loyal and fixated on the successful spring of mighty Marvel heroes that have been paraded to viewers throughout the last few years. Thankfully, **Captain America: Civil War** carries on the tradition of spry superhero-studded spectacles that have been glorious and adventurous from the stable of Marvel-based movies guaranteed to win over the enthusiastic hearts of avid comic book fanboys everywhere.</string>
 
+    <string name="empty"></string>
     <string name="favourites_added_msg">Added to favourites</string>
     <string name="favourites_removed_msg">Removed from favourites</string>
+    <string name="favourites_removed_error">Favourite could not be removed :(</string>
+    <string name="favourites_added_error">Favourite could not be added :(</string>
 
     <string name="details_genre">Genre:</string>
 

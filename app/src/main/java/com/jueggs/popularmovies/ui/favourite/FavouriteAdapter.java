@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
@@ -17,15 +16,16 @@ import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.event.FavouriteDeletedEvent;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.ui.detail.DeleteFavouriteTask;
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_92;
 import static com.jueggs.popularmovies.data.favourites.FavouriteColumns.ProjectionCompleteIndices.*;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
+import static com.jueggs.popularmovies.ui.detail.Callback.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
 public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter.ViewHolder> implements Callback.MovieSwiped
@@ -33,17 +33,22 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     public static final int NO_SELECTION = -1;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
-    private Callback.MovieSelected callback;
+    private Callback.MovieSelected movieSelectedCallback;
+    private FavouriteCRUDstarted crudStartedCallback;
+    private FavouriteCRUDcompleted crudCompletedCallbackExternal;
     private ViewGroup previousSelection;
     private int selectedPosition;
     private RecyclerView recycler;
 
-    public FavouriteAdapter(Context context, Callback.MovieSelected callback, int selectedPosition, RecyclerView recycler)
+    public FavouriteAdapter(Context context, Callback.MovieSelected movieSelectedCallback, FavouriteCRUDstarted crudStartedCallback,
+                            FavouriteCRUDcompleted crudCompletedCallback, int selectedPosition, RecyclerView recycler)
     {
         super(context, null);
-        this.callback = callback;
+        this.movieSelectedCallback = movieSelectedCallback;
         this.selectedPosition = selectedPosition;
         this.recycler = recycler;
+        this.crudStartedCallback = crudStartedCallback;
+        this.crudCompletedCallbackExternal = crudCompletedCallback;
     }
 
     @Override
@@ -63,16 +68,21 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         holder.itemView.setOnClickListener(holder);
 
         if (selectedPosition != NO_SELECTION && selectedPosition == holder.getAdapterPosition())
-        {
             setSelectedMovie(holder.container);
-            recycler.smoothScrollToPosition(selectedPosition);
-        }
 
         byte[] posterBytes = cursor.getBlob(POSTER);
         if (hasElements(posterBytes))
             holder.thumbnail.setImageDrawable(convertByteArrayToDrawable(context.getResources(), posterBytes));
         else
             loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
+    }
+
+    public void setSelectedMovie(ViewGroup container)
+    {
+        container.setBackgroundColor(ContextCompat.getColor(context, R.color.scrim_item_selection));
+        if (previousSelection != null)
+            previousSelection.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+        previousSelection = container;
     }
 
     @Override
@@ -83,21 +93,25 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         Cursor cursor = getCursor();
         cursor.moveToPosition(position);
         int movieId = cursor.getInt(MOVIE_ID);
-        context.getContentResolver().delete(Favourite.withMovieId(movieId), null, null);
 
-        Toast.makeText(context, R.string.favourites_removed_msg, Toast.LENGTH_LONG).show();
+        new DeleteFavouriteTask(crudStartedCallback, crudCompletedCallbackInternal, context.getContentResolver())
+                .execute(Favourite.withMovieId(movieId));
 
         if (App.getInstance().isTwoPane())
             EventBus.getDefault().post(new FavouriteDeletedEvent(movieId));
     }
 
-    public void setSelectedMovie(ViewGroup container)
+    private FavouriteCRUDcompleted crudCompletedCallbackInternal = new FavouriteCRUDcompleted()
     {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.scrim_gridselection));
-        if (previousSelection != null)
-            previousSelection.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-        previousSelection = container;
-    }
+        @Override
+        public void onFavouriteCRUDcompleted(int result,CRUD operation)
+        {
+            int stringId = result > 0 ? R.string.favourites_removed_msg : R.string.favourites_removed_error;
+            Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
+
+            crudCompletedCallbackExternal.onFavouriteCRUDcompleted(result,operation);
+        }
+    };
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
@@ -126,7 +140,7 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
                 setSelectedMovie(container);
             }
 
-            callback.onMovieSelected(movie, getAdapterPosition());
+            movieSelectedCallback.onMovieSelected(movie, getAdapterPosition());
         }
     }
 

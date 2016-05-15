@@ -19,6 +19,7 @@ import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.event.NetworkStateChangeEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
+import com.jueggs.popularmovies.util.UIUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
+import static com.jueggs.popularmovies.util.UIUtils.*;
 
 
 public class RankingFragment extends Fragment
@@ -111,21 +113,16 @@ public class RankingFragment extends Fragment
         @Override
         public void onLoadingMoviesStarted()
         {
-            showLoading(true);
+            showLoading(true,coverLoading);
         }
     };
-
-    private void showLoading(boolean show)
-    {
-        coverLoading.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
 
     private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
     {
         @Override
         public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
         {
-            showLoading(false);
+            showLoading(false,coverLoading);
 
             switch (resultCode)
             {

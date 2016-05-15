@@ -1,13 +1,15 @@
 package com.jueggs.popularmovies.ui.detail;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.net.Uri;
 import android.os.AsyncTask;
 import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
 import com.jueggs.popularmovies.model.Movie;
 
 import static com.jueggs.popularmovies.util.Utils.transformMovieToContentValues;
 
-public class InsertFavouriteTask extends AsyncTask<Movie,Void,Void>
+public class InsertFavouriteTask extends AsyncTask<Movie, Void, Integer>
 {
     private ContentResolver contentResolver;
     private Callback.FavouriteCRUDstarted startedCallback;
@@ -27,15 +29,15 @@ public class InsertFavouriteTask extends AsyncTask<Movie,Void,Void>
     }
 
     @Override
-    protected Void doInBackground(Movie... params)
+    protected Integer doInBackground(Movie... params)
     {
-        contentResolver.insert(FavouritesProvider.Favourite.BASE_URI, transformMovieToContentValues(params[0]));
-        return null;
+        Uri returnUri = contentResolver.insert(FavouritesProvider.Favourite.BASE_URI, transformMovieToContentValues(params[0]));
+        return (int) ContentUris.parseId(returnUri);
     }
 
     @Override
-    protected void onPostExecute(Void aVoid)
+    protected void onPostExecute(Integer rowId)
     {
-        completedCallback.onFavouriteCRUDcompleted();
+        completedCallback.onFavouriteCRUDcompleted(rowId, Callback.CRUD.INSERT);
     }
 }

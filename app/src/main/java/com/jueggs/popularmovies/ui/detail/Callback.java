@@ -34,7 +34,11 @@ public interface Callback
 
     interface FavouriteCRUDcompleted
     {
-        void onFavouriteCRUDcompleted();
+        void onFavouriteCRUDcompleted(int result, CRUD operation);
+    }
 
+    enum CRUD
+    {
+        INSERT, DELETE;
     }
 }

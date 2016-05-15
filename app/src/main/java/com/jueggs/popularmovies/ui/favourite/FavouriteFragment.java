@@ -14,6 +14,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
@@ -21,6 +22,10 @@ import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.util.UIUtils;
+
+import static com.jueggs.popularmovies.ui.detail.Callback.*;
+import static com.jueggs.popularmovies.util.UIUtils.*;
 
 public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Callback.MovieSelected
 {
@@ -28,18 +33,22 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     public static final String STATE_SELECTEDPOSITION = "selectedposition";
 
     @Bind(R.id.recycler) RecyclerView recycler;
+    @Bind(R.id.coverLoading) FrameLayout coverLoading;
 
     private FavouriteAdapter adapter;
     private boolean startup;
-    private int selectedPosition;
+    private int selectedPosition = FavouriteAdapter.NO_SELECTION;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         startup = savedInstanceState == null;
+
         if (savedInstanceState != null)
             selectedPosition = savedInstanceState.getInt(STATE_SELECTEDPOSITION);
+        else if (App.getInstance().isTwoPane())
+            selectedPosition = 0;
     }
 
     @Override
@@ -57,11 +66,32 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, selectedPosition, recycler));
+        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, crudStartedCallback, crudCompletedCallback,
+                selectedPosition, recycler));
+        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
+            recycler.smoothScrollToPosition(selectedPosition);
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;
     }
+
+    private FavouriteCRUDstarted crudStartedCallback = new FavouriteCRUDstarted()
+    {
+        @Override
+        public void onFavouriteCRUDstarted()
+        {
+            showLoading(true, coverLoading);
+        }
+    };
+
+    private FavouriteCRUDcompleted crudCompletedCallback = new FavouriteCRUDcompleted()
+    {
+        @Override
+        public void onFavouriteCRUDcompleted(int result,CRUD operation)
+        {
+            showLoading(false, coverLoading);
+        }
+    };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
