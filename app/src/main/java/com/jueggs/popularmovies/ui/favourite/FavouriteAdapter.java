@@ -38,6 +38,7 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     private FavouriteCRUDcompleted crudCompletedCallbackExternal;
     private ViewGroup previousSelection;
     private int selectedPosition;
+    private int swipedPosition;
     private RecyclerView recycler;
 
     public FavouriteAdapter(Context context, Callback.MovieSelected movieSelectedCallback, FavouriteCRUDstarted crudStartedCallback,
@@ -77,6 +78,7 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
             loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
     }
 
+    //TODO fix buggy selection
     public void setSelectedMovie(ViewGroup container)
     {
         container.setBackgroundColor(ContextCompat.getColor(context, R.color.scrim_item_selection));
@@ -88,8 +90,8 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     @Override
     public void onMovieSwiped(int position)
     {
-//        if (selectedPosition == position)
-//            selectedPosition = NO_SELECTION;
+        swipedPosition = position;
+
         Cursor cursor = getCursor();
         cursor.moveToPosition(position);
         int movieId = cursor.getInt(MOVIE_ID);
@@ -104,12 +106,23 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     private FavouriteCRUDcompleted crudCompletedCallbackInternal = new FavouriteCRUDcompleted()
     {
         @Override
-        public void onFavouriteCRUDcompleted(int result,CRUD operation)
+        public void onFavouriteCRUDcompleted(int result, CRUD operation)
         {
-            int stringId = result > 0 ? R.string.favourites_removed_msg : R.string.favourites_removed_error;
+            int stringId;
+            if (result > 0)
+            {
+                stringId = R.string.favourites_removed_msg;
+                if (selectedPosition > swipedPosition)
+                    selectedPosition--;
+            }
+            else
+            {
+                stringId = R.string.favourites_removed_error;
+            }
+
             Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
 
-            crudCompletedCallbackExternal.onFavouriteCRUDcompleted(result,operation);
+            crudCompletedCallbackExternal.onFavouriteCRUDcompleted(result, operation);
         }
     };
 
