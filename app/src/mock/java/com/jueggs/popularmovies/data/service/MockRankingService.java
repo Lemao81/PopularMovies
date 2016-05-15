@@ -14,7 +14,33 @@ public class MockRankingService implements RankingService
 {
     private static MockRankingService instance;
 
-    DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
+    public static List<Movie> mostPopularMovies;
+    public static List<Movie> topRatedMovies;
+    private static DateFormat dateFormat;
+
+    static
+    {
+        String overviewPopular1 = "Following the events of Age of Ultron, the collective governments of the world pass an act designed to regulate all superhuman activity. This polarizes opinion amongst the Avengers, causing two factions to side with Iron Man or Captain America, which causes an epic battle between former allies.";
+        String overviewPopular2 = "Based upon Marvel Comics’ most unconventional anti-hero, DEADPOOL tells the origin story of former Special Forces operative turned mercenary Wade Wilson, who after being subjected to a rogue experiment that leaves him with accelerated healing powers, adopts the alter ego Deadpool. Armed with his new abilities and a dark, twisted sense of humor, Deadpool hunts down the man who nearly destroyed his life.";
+        String overviewTopRated1 = "Under the direction of a ruthless instructor, a talented young drummer begins to pursue perfection at any cost, even his humanity.";
+        String overviewTopRated2 = "Framed in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope.";
+
+        dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
+
+        List<Movie> movies = new ArrayList<>();
+        movies.add(new Movie(false, new int[]{28, 53, 878, 0}, 271110, "en", "Captain America: Civil War", overviewPopular1, new byte[0],
+                "/5N20rQURev5CNDcMjHVUZhpoCNC.jpg", parseToDate("2016-04-27"), "Captain America: Civil War", 6.95f));
+        movies.add(new Movie(false, new int[]{28, 12, 35, 10749}, 293660, "en", "Deadpool", overviewPopular2, new byte[0],
+                "/k1QUCjNAkfRpWfm1dVJGUmVHzGv.jpg", parseToDate("2016-02-09"), "Deadpool", 7.21f));
+        mostPopularMovies = movies;
+
+        movies = new ArrayList<>();
+        movies.add(new Movie(false, new int[]{18, 10402, 0, 0}, 244786, "en", "Whiplash", overviewTopRated1, new byte[0],
+                "/lIv1QinFqz4dlp5U4lQ6HaiskOZ.jpg", parseToDate("2014-10-10"), "Whiplash", 8.35f));
+        movies.add(new Movie(false, new int[]{18, 80, 0, 0}, 278, "en", "The Shawshank Redemption", overviewTopRated2, new byte[0],
+                "/9O7gLzmreU0nGkIB6K3BsJbzvNv.jpg", parseToDate("1994-09-10"), "The Shawshank Redemption", 8.29f));
+        topRatedMovies = movies;
+    }
 
     private MockRankingService()
     {
@@ -26,10 +52,10 @@ public class MockRankingService implements RankingService
         switch (sortOrder)
         {
             case SORTORDER_POPULAR:
-                callback.onMoviesLoaded(getMostPopularMovies(), sortOrder, RC_OK_NETWORK);
+                callback.onMoviesLoaded(mostPopularMovies, sortOrder, RC_OK_NETWORK);
                 break;
             case SORTORDER_TOPRATED:
-                callback.onMoviesLoaded(getTopRatedMovies(), sortOrder, RC_OK_NETWORK);
+                callback.onMoviesLoaded(topRatedMovies, sortOrder, RC_OK_NETWORK);
                 break;
         }
     }
@@ -41,40 +67,18 @@ public class MockRankingService implements RankingService
         return instance;
     }
 
-    private List<Movie> getMostPopularMovies()
+    private static Date parseToDate(String string)
     {
-        Date date = null;
         try
         {
-            date = dateFormat.parse("2016-04-27");
+            return dateFormat.parse(string);
         }
         catch (ParseException e)
         {
             e.printStackTrace();
+            return null;
         }
-        List<Movie> movies = new ArrayList<>();
-        movies.add(new Movie(false, new int[]{}, 271110, "en", "Captain America: Civil War", overview1, new byte[0],
-                "/5N20rQURev5CNDcMjHVUZhpoCNC.jpg", date, "Captain America: Civil War", 6.95f));
-        return movies;
     }
 
-    private List<Movie> getTopRatedMovies()
-    {
-        Date date = null;
-        try
-        {
-            date = dateFormat.parse("2014-10-10");
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
-        List<Movie> movies = new ArrayList<>();
-        movies.add(new Movie(false, new int[]{}, 244786, "en", "Whiplash", overview2, new byte[0],
-                "/lIv1QinFqz4dlp5U4lQ6HaiskOZ.jpg", date, "Whiplash", 8.35f));
-        return movies;
-    }
 
-    private String overview1 = "Based upon Marvel Comics’ most unconventional anti-hero, DEADPOOL tells the origin story of former Special Forces operative turned mercenary Wade Wilson, who after being subjected to a rogue experiment that leaves him with accelerated healing powers, adopts the alter ego Deadpool. Armed with his new abilities and a dark, twisted sense of humor, Deadpool hunts down the man who nearly destroyed his life.";
-    private String overview2 = "Under the direction of a ruthless instructor, a talented young drummer begins to pursue perfection at any cost, even his humanity.";
 }

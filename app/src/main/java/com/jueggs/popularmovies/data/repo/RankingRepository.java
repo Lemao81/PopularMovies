@@ -2,11 +2,10 @@ package com.jueggs.popularmovies.data.repo;
 
 import android.content.Context;
 import android.util.SparseArray;
-import com.jueggs.popularmovies.data.service.Injection;
+import com.jueggs.popularmovies.Injection;
 import com.jueggs.popularmovies.data.service.RankingService;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.main.Callback;
-import com.jueggs.popularmovies.util.DateTimeUtils;
 
 import java.util.Collections;
 import java.util.Date;
