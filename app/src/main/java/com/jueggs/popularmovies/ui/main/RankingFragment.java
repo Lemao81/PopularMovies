@@ -19,7 +19,7 @@ import com.jueggs.popularmovies.data.repo.RankingRepository;
 import com.jueggs.popularmovies.event.NetworkStateChangeEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
-import com.jueggs.popularmovies.util.UIUtils;
+import com.jueggs.popularmovies.ui.login.LoginActivity;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -82,76 +82,64 @@ public class RankingFragment extends Fragment
         if (!networkAvailable)
             coverNoNetwork.setVisibility(View.VISIBLE);
 
-        rankingAdapter = new RankingAdapter(getContext(), new ArrayList<Movie>());
+        rankingAdapter = new RankingAdapter(getContext(), new ArrayList<>());
         gridView.setAdapter(rankingAdapter);
-        gridView.setOnItemClickListener(posterClickListener);
+        gridView.setOnItemClickListener(this::onPosterClicked);
 
         return view;
     }
 
-    private AdapterView.OnItemClickListener posterClickListener = new AdapterView.OnItemClickListener()
+    private void onPosterClicked(AdapterView<?> parent, View view, int position, long id)
     {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-            Movie movie = rankingAdapter.getItem(position);
-            ((Callback.MovieSelected) getActivity()).onMovieSelected(movie);
-            selectedPosition = position;
-        }
-    };
+        Movie movie = rankingAdapter.getItem(position);
+        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie);
+        selectedPosition = position;
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
         if (networkAvailable)
-            repository.loadMovies(sortOrder, moviesLoadedCallback, startLoadingCallback);
+            repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
     }
 
-    private Callback.StartLoadingMovies startLoadingCallback = new Callback.StartLoadingMovies()
+    private void onStartLoadingMovies()
     {
-        @Override
-        public void onLoadingMoviesStarted()
-        {
-            showLoading(true,coverLoading);
-        }
-    };
+        showLoading(true, coverLoading);
+    }
 
-    private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
+    private void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
     {
-        @Override
-        public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
+        showLoading(false, coverLoading);
+
+        switch (resultCode)
         {
-            showLoading(false,coverLoading);
-
-            switch (resultCode)
-            {
-                case RC_OK_NETWORK:
-                    Toast.makeText(getContext(), R.string.msg_moviesupdated, Toast.LENGTH_SHORT).show();
-                case RC_OK_CACHE:
-                    updateMovies(movies, sortOrder);
-                    break;
-                case RC_NO_NETWORK:
-                    handleFailedMovieUpdate(R.string.msg_nonetwork);
-                    break;
-                case RC_ERROR:
-                    handleFailedMovieUpdate(R.string.msg_error);
-                    break;
-                default:
-                    Log.e(TAG, "unknown result code");
-            }
-
-            if (startup && App.getInstance().isTwoPane())
-                ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(movies, sortOrder, resultCode);
+            case RC_OK_NETWORK:
+                Toast.makeText(getContext(), R.string.msg_moviesupdated, Toast.LENGTH_SHORT).show();
+            case RC_OK_CACHE:
+                updateMovies(movies, sortOrder);
+                break;
+            case RC_NO_NETWORK:
+                handleFailedMovieUpdate(R.string.msg_nonetwork);
+                break;
+            case RC_ERROR:
+                handleFailedMovieUpdate(R.string.msg_error);
+                break;
+            default:
+                Log.e(TAG, "unknown result code");
         }
-    };
+
+        if (startup && App.getInstance().isTwoPane())
+            ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(movies, sortOrder, resultCode);
+    }
 
     private void updateMovies(List<Movie> movies, int sortOrder)
     {
         rankingAdapter.clear();
         rankingAdapter.addAll(movies);
         setTitle(sortOrder);
-        selectMovie(selectedPosition);
+        setMovieSelection(selectedPosition);
         RankingFragment.this.sortOrder = sortOrder;
     }
 
@@ -199,11 +187,11 @@ public class RankingFragment extends Fragment
         {
             enableNetworkChangeReceiver(getContext(), false);
             coverNoNetwork.setVisibility(View.GONE);
-            repository.loadMovies(sortOrder, moviesLoadedCallback,startLoadingCallback);
+            repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
         }
     }
 
-    public void selectMovie(int position)
+    public void setMovieSelection(int position)
     {
         gridView.smoothScrollToPosition(position);
         gridView.setItemChecked(position, true);
@@ -227,17 +215,20 @@ public class RankingFragment extends Fragment
         switch (item.getItemId())
         {
             case R.id.menu_popular:
-                repository.loadMovies(SORTORDER_POPULAR, moviesLoadedCallback, startLoadingCallback);
+                repository.loadMovies(SORTORDER_POPULAR, this::onStartLoadingMovies, this::onMoviesLoaded);
                 break;
             case R.id.menu_toprated:
-                repository.loadMovies(SORTORDER_TOPRATED, moviesLoadedCallback,startLoadingCallback);
+                repository.loadMovies(SORTORDER_TOPRATED, this::onStartLoadingMovies, this::onMoviesLoaded);
                 break;
             case R.id.menu_refresh:
                 repository.clear(sortOrder);
-                repository.loadMovies(sortOrder, moviesLoadedCallback,startLoadingCallback);
+                repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
                 break;
             case R.id.menu_favourites:
                 startActivity(new Intent(getContext(), FavouriteActivity.class));
+                break;
+            case R.id.menu_login:
+                startActivity(new Intent(getContext(), LoginActivity.class));
                 break;
         }
         return true;
