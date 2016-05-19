@@ -29,34 +29,26 @@ public class TrailerRepository
         startLoadingCallback.onLoadingTrailerStarted();
 
         if (cache.get(movieId) != null)
-        {
             trailerLoadedCallback.onTrailerLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
-        }
         else
         {
             if (isNetworkAvailable(context))
             {
                 this.callback = trailerLoadedCallback;
                 this.movieId = movieId;
-                service.fetchTrailers(movieId, this.trailerLoadedCallback);
+                service.fetchTrailers(movieId, this::onTrailerLoaded);
             }
             else
-            {
                 trailerLoadedCallback.onTrailerLoaded(null, RC_NO_NETWORK);
-            }
         }
     }
 
-    private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
+    private void onTrailerLoaded(List<Trailer> trailers, int resultCode)
     {
-        @Override
-        public void onTrailerLoaded(List<Trailer> trailers, int resultCode)
-        {
-            cache.put(movieId, trailers);
-            if (callback != null)
-                callback.onTrailerLoaded(trailers, resultCode);
-        }
-    };
+        cache.put(movieId, trailers);
+        if (callback != null)
+            callback.onTrailerLoaded(trailers, resultCode);
+    }
 
     private TrailerRepository(Context context)
     {

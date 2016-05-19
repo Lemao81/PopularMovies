@@ -30,9 +30,7 @@ public class RankingActivity extends AppCompatActivity implements Callback.Movie
     public void onMovieSelected(Movie movie)
     {
         if (App.getInstance().isTwoPane())
-        {
             getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
-        }
         else
         {
             Intent intent = new Intent(this, DetailActivity.class);
@@ -48,13 +46,11 @@ public class RankingActivity extends AppCompatActivity implements Callback.Movie
 
         if (hasElements(movies))
         {
-            ((RankingFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.ranking_fragment_tag))).selectMovie(0);
+            ((RankingFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.ranking_fragment_tag))).setMovieSelection(0);
             fragment = DetailFragment.createInstance(movies.get(0));
         }
         else
-        {
             fragment = new AlternativeFragment();
-        }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, fragment).commit();
     }

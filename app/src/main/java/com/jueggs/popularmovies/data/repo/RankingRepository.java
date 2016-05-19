@@ -35,7 +35,7 @@ public class RankingRepository
         this.context = context;
     }
 
-    public void loadMovies(int sortOrder, Callback.MoviesLoaded moviesLoadedCallback,Callback.StartLoadingMovies startLoadingCallback)
+    public void loadMovies(int sortOrder, Callback.StartLoadingMovies startLoadingCallback, Callback.MoviesLoaded moviesLoadedCallback)
     {
         startLoadingCallback.onLoadingMoviesStarted();
 
@@ -46,24 +46,23 @@ public class RankingRepository
             if (isNetworkAvailable(context))
             {
                 this.callback = moviesLoadedCallback;
-                service.fetchMovies(sortOrder, this.moviesLoadedCallback);
+                service.fetchMovies(sortOrder, this::onMoviesLoaded);
             }
             else
+            {
                 moviesLoadedCallback.onMoviesLoaded(null, sortOrder, RC_NO_NETWORK);
+                enableNetworkChangeReceiver(context, true);
+            }
         }
     }
 
-    private Callback.MoviesLoaded moviesLoadedCallback = new Callback.MoviesLoaded()
+    private void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
     {
-        @Override
-        public void onMoviesLoaded(List<Movie> movies, int sortOrder, int resultCode)
-        {
-            cache.put(sortOrder, movies);
-            lastUpdate = new Date();
-            if (callback != null)
-                callback.onMoviesLoaded(movies, sortOrder, resultCode);
-        }
-    };
+        cache.put(sortOrder, movies);
+        lastUpdate = new Date();
+        if (callback != null)
+            callback.onMoviesLoaded(movies, sortOrder, resultCode);
+    }
 
     public void clear(int sortOrder)
     {

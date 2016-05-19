@@ -25,6 +25,10 @@
         <activity
             android:name=".ui.favourite.FavouriteActivity"
             android:parentActivityName=".ui.main.RankingActivity" />
+        <activity
+            android:theme="@style/LoginTheme"
+            android:name=".ui.login.LoginActivity"
+            android:parentActivityName=".ui.main.RankingActivity" />
 
         <provider
             android:name=".data.favourites.generated.FavouritesProvider"

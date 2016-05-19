@@ -25,6 +25,7 @@ public class MovieDbContract
     public static final String MOVIEDB_WEBSITE = "https://www.themoviedb.org/";
     public static final String BASE_URL_MOVIES = "http://api.themoviedb.org/3/movie";
     public static final String BASE_URL_IMAGES = "http://image.tmdb.org/t/p";
+    public static final String BASE_URL_TOKEN = "http://api.themoviedb.org/3/authentication/token";
     public static final String BASE_URL_YOUTUBE = "http://www.youtube.com/watch";
     public static final String PATH_POPULAR = "popular";
     public static final String PATH_TOPRATED = "top_rated";
@@ -56,6 +57,8 @@ public class MovieDbContract
     public static final String PROP_GENRE_IDS = "genre_ids";
     public static final String PROP_ORIG_TITLE = "original_title";
     public static final String PROP_ORIG_LANG = "original_language";
+    public static final String PROP_REQUEST_TOKEN = "request_token";
+    public static final String PROP_SUCCESS = "success";
 
     public static final String IMG_WIDTH_92 = "w92";
     public static final String IMG_WIDTH_154 = "w154";

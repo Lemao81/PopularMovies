@@ -3,6 +3,7 @@ package com.jueggs.popularmovies.util;
 import android.util.Log;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Review;
+import com.jueggs.popularmovies.model.Token;
 import com.jueggs.popularmovies.model.Trailer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,9 +126,27 @@ public class ParseUtils
         }
         catch (JSONException e)
         {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
 
         return reviews;
+    }
+
+    public static Token getTokenFromJSON(String jsonString)
+    {
+        Token token = new Token();
+        try
+        {
+            JSONObject root = new JSONObject(jsonString);
+
+            token.setToken(root.getString(PROP_REQUEST_TOKEN));
+            token.setSuccess(root.getBoolean(PROP_SUCCESS));
+        }
+        catch (JSONException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return token;
     }
 }

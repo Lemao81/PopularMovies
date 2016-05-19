@@ -13,6 +13,7 @@
     <string name="menu_favourites">Favourites</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_share">Share</string>
+    <string name="menu_login">Login</string>
 
     <string name="msg_moviesupdated">Updated movie list</string>
     <string name="msg_nonetwork">No network available :(</string>
@@ -41,5 +42,11 @@
 
     <string name="share_trailerurl_type">text/plain</string>
 
-    <string name="cover_nonetwork">No network connection</string>
+
+    <string name="user_name">User Name</string>
+    <string name="password">Password</string>
+    <string name="button_login">Login</string>
+
+    <string name="ranking_nonetwork">No network connection</string>
+    <string name="ranking_nodata">No movie data available</string>
 </resources>

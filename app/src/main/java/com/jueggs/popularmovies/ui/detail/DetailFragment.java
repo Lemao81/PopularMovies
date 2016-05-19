@@ -116,7 +116,15 @@ public class DetailFragment extends Fragment
 
         isFavourite = contentResolver.query(movieIdUri, new String[]{FavouriteColumns._ID}, null, null, null).moveToFirst();
         setStarDrawable(isFavourite);
-        favourite.setOnClickListener(addFavouriteClickListener);
+        favourite.setOnClickListener(this::onAddFavouriteClicked);
+    }
+
+    private void onAddFavouriteClicked(View v)
+    {
+        if (isFavourite)
+            new DeleteFavouriteTask(this::onCRUDoperationStarted, this::onCRUDoperationCompleted, contentResolver).execute(movieIdUri);
+        else
+            new InsertFavouriteTask(this::onCRUDoperationStarted, this::onCRUDoperationCompleted, contentResolver).execute(movie);
     }
 
     private PicassoCallbackAdapter picassoCallback = new PicassoCallbackAdapter()
@@ -131,8 +139,69 @@ public class DetailFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
-        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), startLoadingTrailerCallback, trailerLoadedCallback);
-        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), startLoadingReviewsCallback, reviewLoadedCallback);
+        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), this::onStartLoadingTrailer, this::onTrailerLoaded);
+        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), this::onStartLoadingReviews, this::onReviewsLoaded);
+    }
+
+    private void onStartLoadingTrailer()
+    {
+        showLoading(true, coverLoading);
+    }
+
+    private void onTrailerLoaded(List<Trailer> trailers, int resultCode)
+    {
+        DetailFragment.this.trailers = trailers;
+        trailerLoaded = true;
+        if (reviewLoaded)
+            showLoading(false, coverLoading);
+
+        switch (resultCode)
+        {
+            case RC_OK_NETWORK:
+            case RC_OK_CACHE:
+                if (reviewLoaded)
+                    updateTrailerAndReview();
+                if (actionProvider != null && hasElements(trailers))
+                    actionProvider.setShareIntent(createShareIntent());
+                break;
+            case RC_NO_NETWORK:
+                showToast(R.string.msg_nonetwork);
+                break;
+            case RC_ERROR:
+                showToast(R.string.msg_error);
+                break;
+            default:
+                Log.e(TAG, "unknown result code");
+        }
+    }
+
+    private void onStartLoadingReviews()
+    {
+        showLoading(true, coverLoading);
+    }
+
+    private void onReviewsLoaded(List<Review> reviews, int resultCode)
+    {
+        DetailFragment.this.reviews = reviews;
+        reviewLoaded = true;
+        if (trailerLoaded)
+            showLoading(false, coverLoading);
+
+        switch (resultCode)
+        {
+            case RC_OK_NETWORK:
+            case RC_OK_CACHE:
+                if (trailerLoaded)
+                    updateTrailerAndReview();
+                break;
+            case RC_NO_NETWORK:
+                break;
+            case RC_ERROR:
+                showToast(R.string.msg_error);
+                break;
+            default:
+                Log.e(TAG, "unknown result code");
+        }
     }
 
     @Override
@@ -151,60 +220,40 @@ public class DetailFragment extends Fragment
             EventBus.getDefault().unregister(this);
     }
 
-    private View.OnClickListener addFavouriteClickListener = new View.OnClickListener()
+    private void onCRUDoperationStarted()
     {
-        @Override
-        public void onClick(View v)
-        {
-            if (isFavourite)
-                new DeleteFavouriteTask(crudStartedCallback, crudCompletedCallback, contentResolver).execute(movieIdUri);
-            else
-                new InsertFavouriteTask(crudStartedCallback, crudCompletedCallback, contentResolver).execute(movie);
-        }
-    };
+        showLoading(true, coverLoading);
+    }
 
-    private Callback.FavouriteCRUDstarted crudStartedCallback = new Callback.FavouriteCRUDstarted()
+    private void onCRUDoperationCompleted(int result, Callback.CRUD operation)
     {
-        @Override
-        public void onFavouriteCRUDstarted()
-        {
-            showLoading(true, coverLoading);
-        }
-    };
+        showLoading(false, coverLoading);
 
-    private Callback.FavouriteCRUDcompleted crudCompletedCallback = new Callback.FavouriteCRUDcompleted()
-    {
-        @Override
-        public void onFavouriteCRUDcompleted(int result, Callback.CRUD operation)
+        int stringId = R.string.empty;
+        switch (operation)
         {
-            showLoading(false, coverLoading);
-
-            int stringId = R.string.empty;
-            switch (operation)
-            {
-                case INSERT:
-                    if (result != -1)
-                    {
-                        stringId = R.string.favourites_added_msg;
-                        setStarDrawable(true);
-                        isFavourite = true;
-                    }
-                    else
-                        stringId = R.string.favourites_added_error;
-                    break;
-                case DELETE:
-                    if (result > 0)
-                    {
-                        stringId = R.string.favourites_removed_msg;
-                        removeFavourite();
-                    }
-                    else
-                        stringId = R.string.favourites_removed_error;
-                    break;
-            }
-            showToast(stringId);
+            case INSERT:
+                if (result != -1)
+                {
+                    stringId = R.string.favourites_added_msg;
+                    setStarDrawable(true);
+                    isFavourite = true;
+                }
+                else
+                    stringId = R.string.favourites_added_error;
+                break;
+            case DELETE:
+                if (result > 0)
+                {
+                    stringId = R.string.favourites_removed_msg;
+                    removeFavourite();
+                }
+                else
+                    stringId = R.string.favourites_removed_error;
+                break;
         }
-    };
+        showToast(stringId);
+    }
 
     private void removeFavourite()
     {
@@ -216,83 +265,6 @@ public class DetailFragment extends Fragment
     {
         favourite.setImageResource(checked ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
     }
-
-    private Callback.StartLoadingTrailer startLoadingTrailerCallback = new Callback.StartLoadingTrailer()
-    {
-        @Override
-        public void onLoadingTrailerStarted()
-        {
-            showLoading(true, coverLoading);
-        }
-    };
-
-    private Callback.TrailerLoaded trailerLoadedCallback = new Callback.TrailerLoaded()
-    {
-        @Override
-        public void onTrailerLoaded(List<Trailer> trailers, int resultCode)
-        {
-            DetailFragment.this.trailers = trailers;
-            trailerLoaded = true;
-            if (reviewLoaded)
-                showLoading(false, coverLoading);
-
-            switch (resultCode)
-            {
-                case RC_OK_NETWORK:
-                case RC_OK_CACHE:
-                    if (reviewLoaded)
-                        updateTrailerAndReview();
-                    if (actionProvider != null && hasElements(trailers))
-                        actionProvider.setShareIntent(createShareIntent());
-                    break;
-                case RC_NO_NETWORK:
-                    showToast(R.string.msg_nonetwork);
-                    break;
-                case RC_ERROR:
-                    showToast(R.string.msg_error);
-                    break;
-                default:
-                    Log.e(TAG, "unknown result code");
-            }
-        }
-    };
-
-    private Callback.StartLoadingReviews startLoadingReviewsCallback = new Callback.StartLoadingReviews()
-    {
-        @Override
-        public void onLoadingReviewsStarted()
-        {
-            showLoading(true, coverLoading);
-        }
-    };
-
-    private Callback.ReviewsLoaded reviewLoadedCallback = new Callback.ReviewsLoaded()
-    {
-        @Override
-        public void onReviewsLoaded(List<Review> reviews, int resultCode)
-        {
-            DetailFragment.this.reviews = reviews;
-            reviewLoaded = true;
-            if (trailerLoaded)
-                showLoading(false, coverLoading);
-
-            switch (resultCode)
-            {
-                case RC_OK_NETWORK:
-                case RC_OK_CACHE:
-                    if (trailerLoaded)
-                        updateTrailerAndReview();
-                    break;
-                case RC_NO_NETWORK:
-                    break;
-                case RC_ERROR:
-                    showToast(R.string.msg_error);
-                    break;
-                default:
-                    Log.e(TAG, "unknown result code");
-            }
-        }
-    };
 
     private void updateTrailerAndReview()
     {

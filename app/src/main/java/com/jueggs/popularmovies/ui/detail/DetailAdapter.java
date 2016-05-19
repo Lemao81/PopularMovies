@@ -38,7 +38,7 @@ public class DetailAdapter
     {
         container.removeAllViews();
 
-        new ListCreator<Trailer>(trailers, R.string.trailer_header, R.layout.listitem_trailer)
+        new ListCreator<Trailer>(trailers, R.string.trailer_header, R.layout.listitem_trailer, true)
         {
             @Override
             void bindView(View view, final Trailer trailer)
@@ -59,7 +59,7 @@ public class DetailAdapter
             }
         }.createList();
 
-        new ListCreator<Review>(reviews, R.string.review_header, R.layout.listitem_review)
+        new ListCreator<Review>(reviews, R.string.review_header, R.layout.listitem_review_card, false)
         {
             @Override
             void bindView(View view, Review review)
@@ -76,14 +76,16 @@ public class DetailAdapter
         private List<T> items;
         private int resHeaderId;
         private int resItemId;
+        private boolean addDivider;
 
         abstract void bindView(View view, T item);
 
-        public ListCreator(List<T> items, int resHeaderId, int resItemId)
+        public ListCreator(List<T> items, int resHeaderId, int resItemId, boolean addDivider)
         {
             this.items = items;
             this.resHeaderId = resHeaderId;
             this.resItemId = resItemId;
+            this.addDivider = addDivider;
         }
 
         public void createList()
@@ -104,7 +106,7 @@ public class DetailAdapter
                     View view = inflater.inflate(resItemId, container, false);
                     bindView(view, items.get(i));
                     container.addView(view);
-                    if (i < size - 1)
+                    if (addDivider && i < size - 1)
                         container.addView(inflater.inflate(R.layout.divider_vague, container, false));
                 }
             }

@@ -69,8 +69,8 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, crudStartedCallback, crudCompletedCallback,
                 selectedPosition, recycler));
-        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
-            recycler.smoothScrollToPosition(selectedPosition);
+//        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
+//            recycler.smoothScrollToPosition(selectedPosition);
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;
@@ -115,6 +115,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
                 }
             });
         }
+        //TODO check if this is ok (loadfinished called for every configuration change?)
+        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
+            recycler.smoothScrollToPosition(selectedPosition);
     }
 
     @Override

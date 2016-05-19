@@ -7,10 +7,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
@@ -20,6 +17,7 @@ import com.jueggs.popularmovies.event.NetworkStateChangeEvent;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.favourite.FavouriteActivity;
 import com.jueggs.popularmovies.ui.login.LoginActivity;
+import com.jueggs.popularmovies.util.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -29,6 +27,7 @@ import java.util.List;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
 import static com.jueggs.popularmovies.util.UIUtils.*;
+import static com.jueggs.popularmovies.util.Utils.*;
 
 
 public class RankingFragment extends Fragment
@@ -40,13 +39,13 @@ public class RankingFragment extends Fragment
     @Bind(R.id.gridView) GridView gridView;
     @Bind(R.id.coverNoNetwork) FrameLayout coverNoNetwork;
     @Bind(R.id.coverLoading) FrameLayout coverLoading;
+    @Bind(R.id.nodata) TextView nodata;
 
     private RankingAdapter rankingAdapter;
     private RankingRepository repository;
     private int sortOrder = SORTORDER_POPULAR;
     private int selectedPosition = 0;
     private boolean startup;
-    private boolean networkAvailable;
     private SparseArray<String> titles = new SparseArray<>(NUM_SORTORDER);
 
     @Override
@@ -57,10 +56,6 @@ public class RankingFragment extends Fragment
 
         titles.put(SORTORDER_POPULAR, getString(R.string.title_popular));
         titles.put(SORTORDER_TOPRATED, getString(R.string.title_toprated));
-
-        networkAvailable = isNetworkAvailable(getContext());
-        if (!networkAvailable)
-            enableNetworkChangeReceiver(getContext(), true);
 
         startup = savedInstanceState == null;
 
@@ -79,12 +74,10 @@ public class RankingFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_ranking, container, false);
         ButterKnife.bind(this, view);
 
-        if (!networkAvailable)
-            coverNoNetwork.setVisibility(View.VISIBLE);
-
         rankingAdapter = new RankingAdapter(getContext(), new ArrayList<>());
         gridView.setAdapter(rankingAdapter);
         gridView.setOnItemClickListener(this::onPosterClicked);
+        gridView.setEmptyView(coverNoNetwork);
 
         return view;
     }
@@ -100,8 +93,7 @@ public class RankingFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        if (networkAvailable)
-            repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
+        repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
     }
 
     private void onStartLoadingMovies()
@@ -113,40 +105,40 @@ public class RankingFragment extends Fragment
     {
         showLoading(false, coverLoading);
 
+        String msg = null;
+
         switch (resultCode)
         {
             case RC_OK_NETWORK:
-                Toast.makeText(getContext(), R.string.msg_moviesupdated, Toast.LENGTH_SHORT).show();
+                msg = getString(R.string.msg_moviesupdated);
             case RC_OK_CACHE:
-                updateMovies(movies, sortOrder);
                 break;
             case RC_NO_NETWORK:
-                handleFailedMovieUpdate(R.string.msg_nonetwork);
+                sortOrder = SORTORDER_INVALID;
+                nodata.setText(R.string.ranking_nonetwork);
+                msg = getString(R.string.msg_nonetwork);
                 break;
             case RC_ERROR:
-                handleFailedMovieUpdate(R.string.msg_error);
+                sortOrder = SORTORDER_INVALID;
+                nodata.setText(R.string.ranking_nodata);
+                msg = getString(R.string.msg_error);
                 break;
             default:
                 Log.e(TAG, "unknown result code");
         }
 
+        rankingAdapter.clear();
+        if (hasElements(movies))
+            rankingAdapter.addAll(movies);
+        setTitle(sortOrder);
+        if (App.getInstance().isTwoPane())
+            setMovieSelection(selectedPosition);
+        this.sortOrder = sortOrder;
+        if (msg != null)
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+
         if (startup && App.getInstance().isTwoPane())
             ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(movies, sortOrder, resultCode);
-    }
-
-    private void updateMovies(List<Movie> movies, int sortOrder)
-    {
-        rankingAdapter.clear();
-        rankingAdapter.addAll(movies);
-        setTitle(sortOrder);
-        setMovieSelection(selectedPosition);
-        RankingFragment.this.sortOrder = sortOrder;
-    }
-
-    private void handleFailedMovieUpdate(int stringId)
-    {
-        RankingFragment.this.sortOrder = SORTORDER_INVALID;
-        Toast.makeText(getContext(), stringId, Toast.LENGTH_LONG).show();
     }
 
     private void setTitle(int sortOrder)
@@ -186,7 +178,8 @@ public class RankingFragment extends Fragment
         if (event.connected)
         {
             enableNetworkChangeReceiver(getContext(), false);
-            coverNoNetwork.setVisibility(View.GONE);
+            if (sortOrder == SORTORDER_INVALID)
+                sortOrder = SORTORDER_POPULAR;
             repository.loadMovies(sortOrder, this::onStartLoadingMovies, this::onMoviesLoaded);
         }
     }
@@ -195,12 +188,6 @@ public class RankingFragment extends Fragment
     {
         gridView.smoothScrollToPosition(position);
         gridView.setItemChecked(position, true);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
-        menu.findItem(R.id.menu_refresh).setEnabled(networkAvailable);
     }
 
     @Override

@@ -31,34 +31,26 @@ public class ReviewRepository
         startLoadingCallback.onLoadingReviewsStarted();
 
         if (cache.get(movieId) != null)
-        {
             reviewsLoadedCallback.onReviewsLoaded(Collections.unmodifiableList(cache.get(movieId)), RC_OK_CACHE);
-        }
         else
         {
             if (isNetworkAvailable(context))
             {
                 this.callback = reviewsLoadedCallback;
                 this.movieId = movieId;
-                service.fetchReviews(movieId, this.reviewsLoadedCallback);
+                service.fetchReviews(movieId, this::onReviewsLoaded);
             }
             else
-            {
                 reviewsLoadedCallback.onReviewsLoaded(null, RC_NO_NETWORK);
-            }
         }
     }
 
-    private Callback.ReviewsLoaded reviewsLoadedCallback = new Callback.ReviewsLoaded()
+    private void onReviewsLoaded(List<Review> reviews, int resultCode)
     {
-        @Override
-        public void onReviewsLoaded(List<Review> reviews, int resultCode)
-        {
-            cache.put(movieId, reviews);
-            if (callback != null)
-                callback.onReviewsLoaded(reviews, resultCode);
-        }
-    };
+        cache.put(movieId, reviews);
+        if (callback != null)
+            callback.onReviewsLoaded(reviews, resultCode);
+    }
 
     private ReviewRepository(Context context)
     {
