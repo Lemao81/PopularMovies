@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.jueggs.popularmovies.util.Utils;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class Movie implements Parcelable
@@ -27,13 +28,21 @@ public class Movie implements Parcelable
     @Override
     public boolean equals(Object other)
     {
-        if(!(other instanceof Movie))
-            return false;
+        if (this == other) return true;
+        if (other == null || !(other instanceof Movie)) return false;
         Movie o = (Movie) other;
-        return dbId == o.dbId && movieId == o.movieId && title.equals(o.title) && releaseDate.getTime() == o.releaseDate.getTime() &&
-                posterPath.equals(o.posterPath) && voteAverage == o.voteAverage && overview.equals(o.overview) &&
-                Utils.encodeGenreIds(genreIds) == Utils.encodeGenreIds(o.genreIds) && adult == o.adult && originalTitle.equals(o.originalTitle) &&
-                originalLanguage.equals(o.originalLanguage) && poster.equals(o.poster);
+        return dbId == o.dbId &&
+                movieId == o.movieId &&
+                title.equals(o.title) &&
+                releaseDate.getTime() == o.releaseDate.getTime() &&
+                posterPath.equals(o.posterPath) &&
+                voteAverage == o.voteAverage &&
+                overview.equals(o.overview) &&
+                Utils.encodeGenreIds(genreIds) == Utils.encodeGenreIds(o.genreIds) &&
+                adult == o.adult &&
+                originalTitle.equals(o.originalTitle) &&
+                originalLanguage.equals(o.originalLanguage) &&
+                Arrays.equals(poster, o.poster);
     }
 
     public Movie()
@@ -118,7 +127,6 @@ public class Movie implements Parcelable
             return new Movie[size];
         }
     };
-
 
 
     public long getDbId()

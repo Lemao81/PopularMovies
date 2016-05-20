@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Review;
 import com.jueggs.popularmovies.model.Trailer;
 
@@ -59,7 +58,7 @@ public class DetailAdapter
             }
         }.createList();
 
-        new ListCreator<Review>(reviews, R.string.review_header, R.layout.listitem_review_card, false)
+        new ListCreator<Review>(reviews, R.string.review_header, R.layout.listitem_review, false)
         {
             @Override
             void bindView(View view, Review review)

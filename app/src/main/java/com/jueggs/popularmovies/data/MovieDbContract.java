@@ -14,6 +14,7 @@ public class MovieDbContract
     public static final int SORTORDER_INVALID = -1;
     public static final int SORTORDER_POPULAR = 1;
     public static final int SORTORDER_TOPRATED = 2;
+
     public static final int MASK_SORTORDER_REFRESHABLE = SORTORDER_POPULAR | SORTORDER_TOPRATED;
     public static final int NUM_SORTORDER = 2;
 
@@ -22,17 +23,26 @@ public class MovieDbContract
     public static final int RC_NO_NETWORK = 2;
     public static final int RC_ERROR = 3;
 
-    public static final String MOVIEDB_WEBSITE = "https://www.themoviedb.org/";
-    public static final String BASE_URL_MOVIES = "http://api.themoviedb.org/3/movie";
-    public static final String BASE_URL_IMAGES = "http://image.tmdb.org/t/p";
-    public static final String BASE_URL_TOKEN = "http://api.themoviedb.org/3/authentication/token";
-    public static final String BASE_URL_YOUTUBE = "http://www.youtube.com/watch";
+    public static final Uri BASE_URI = Uri.parse("http://api.themoviedb.org/3");
+    public static final Uri BASE_URI_IMAGES = Uri.parse("http://image.tmdb.org/t/p");
+    public static final Uri BASE_URI_YOUTUBE = Uri.parse("http://www.youtube.com/watch");
+
+    public static final String PATH_MOVIE = "movie";
     public static final String PATH_POPULAR = "popular";
     public static final String PATH_TOPRATED = "top_rated";
     public static final String PATH_VIDEOS = "videos";
     public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_AUTHENTICATION = "authentication";
+    public static final String PATH_TOKEN = "token";
+    public static final String PATH_NEW = "new";
+    public static final String PATH_VALIDATE_LOGIN = "validate_with_login";
+    public static final String PATH_SESSION = "session";
+
     public static final String QUERY_KEY_APIKEY = "api_key";
     public static final String QUERY_KEY_YOUTUBE_VIDEO = "v";
+    public static final String QUERY_KEY_REQ_TOKEN = "request_token";
+    public static final String QUERY_KEY_USERNAME = "username";
+    public static final String QUERY_KEY_PASSWORD = "password";
 
     public static final int NUM_SORTORDER_PATHS = 2;
     public static final SparseArray<String> PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
@@ -59,6 +69,8 @@ public class MovieDbContract
     public static final String PROP_ORIG_LANG = "original_language";
     public static final String PROP_REQUEST_TOKEN = "request_token";
     public static final String PROP_SUCCESS = "success";
+    public static final String PROP_EXPIRATION = "expires_at";
+    public static final String PROP_SESSION_ID = "session_id";
 
     public static final String IMG_WIDTH_92 = "w92";
     public static final String IMG_WIDTH_154 = "w154";
@@ -68,7 +80,8 @@ public class MovieDbContract
     public static final String IMG_WIDTH_780 = "w780";
     public static final String IMG_WIDTH_ORIG = "original";
 
-    public static final String DATE_PATTERN = "yyyy-MM-dd";
+    public static final String DATE_PATTERN_REL_DATE = "yyyy-MM-dd";
+    public static final String DATE_PATTERN_EXPIRATION = "yyyy-MM-dd HH:mm:ss z";
 
     public static final SparseArray<String> GENRES = new SparseArray<>();
 
@@ -101,22 +114,30 @@ public class MovieDbContract
 
     public static Uri createRankingUri(int sortOrder)
     {
-        return appendApiKeyQuery(Uri.parse(BASE_URL_MOVIES).buildUpon().appendEncodedPath(PATHS.get(sortOrder)));
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(PATHS.get(sortOrder)));
     }
 
     public static Uri createImageUri(String width, String posterPath)
     {
-        return Uri.parse(BASE_URL_IMAGES).buildUpon().appendEncodedPath(width).appendEncodedPath(posterPath).build();
+        return BASE_URI_IMAGES.buildUpon().appendPath(width).appendPath(posterPath).build();
     }
 
     public static Uri createTrailerUri(int id)
     {
-        return appendApiKeyQuery(Uri.parse(BASE_URL_MOVIES).buildUpon().appendEncodedPath(String.valueOf(id)).appendEncodedPath(PATH_VIDEOS));
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(String.valueOf(id))
+                .appendPath(PATH_VIDEOS));
     }
 
     public static Uri createReviewUri(int id)
     {
-        return appendApiKeyQuery(Uri.parse(BASE_URL_MOVIES).buildUpon().appendEncodedPath(String.valueOf(id)).appendEncodedPath(PATH_REVIEWS));
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(String.valueOf(id))
+                .appendPath(PATH_REVIEWS));
     }
 
     private static Uri appendApiKeyQuery(Uri.Builder builder)
@@ -126,6 +147,35 @@ public class MovieDbContract
 
     public static Uri createYoutubeUri(String key)
     {
-        return Uri.parse(BASE_URL_YOUTUBE).buildUpon().appendQueryParameter(QUERY_KEY_YOUTUBE_VIDEO, key).build();
+        return BASE_URI_YOUTUBE.buildUpon()
+                .appendQueryParameter(QUERY_KEY_YOUTUBE_VIDEO, key).build();
+    }
+
+    public static Uri createRequestTokenUri()
+    {
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_AUTHENTICATION)
+                .appendPath(PATH_TOKEN)
+                .appendPath(PATH_NEW));
+    }
+
+    public static Uri createAuthenticationUri(String reqToken, String username, String password)
+    {
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_AUTHENTICATION)
+                .appendPath(PATH_TOKEN)
+                .appendPath(PATH_VALIDATE_LOGIN)
+                .appendQueryParameter(QUERY_KEY_REQ_TOKEN, reqToken)
+                .appendQueryParameter(QUERY_KEY_USERNAME, username)
+                .appendQueryParameter(QUERY_KEY_PASSWORD, password));
+    }
+
+    public static Uri createSessionIdUri(String reqToken)
+    {
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_AUTHENTICATION)
+                .appendPath(PATH_SESSION)
+                .appendPath(PATH_NEW)
+                .appendQueryParameter(QUERY_KEY_REQ_TOKEN, reqToken));
     }
 }

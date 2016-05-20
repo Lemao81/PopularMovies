@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/space_xxlarge">
+    android:padding="@dimen/space_large"
+    android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -27,7 +27,6 @@
             android:layout_height="wrap_content"
             android:hint="@string/password" />
     </android.support.design.widget.TextInputLayout>
-
 
     <Button
         android:id="@+id/login"

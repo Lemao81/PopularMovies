@@ -25,7 +25,7 @@ public class ParseUtils
 
     public static List<Movie> getMovieListFromJSON(String jsonString)
     {
-        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN_REL_DATE, Locale.ENGLISH);
         List<Movie> movies = new ArrayList<>();
 
         try
@@ -134,6 +134,8 @@ public class ParseUtils
 
     public static Token getTokenFromJSON(String jsonString)
     {
+        DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN_EXPIRATION, Locale.ENGLISH);
+
         Token token = new Token();
         try
         {
@@ -141,6 +143,14 @@ public class ParseUtils
 
             token.setToken(root.getString(PROP_REQUEST_TOKEN));
             token.setSuccess(root.getBoolean(PROP_SUCCESS));
+            try
+            {
+                token.setExpiration(dateFormat.parse(root.getString(PROP_EXPIRATION)));
+            }
+            catch (ParseException e)
+            {
+                e.printStackTrace();
+            }
         }
         catch (JSONException e)
         {
@@ -148,5 +158,40 @@ public class ParseUtils
         }
 
         return token;
+    }
+
+    public static boolean getAuthenticationResultFromJSON(String jsonString)
+    {
+        try
+        {
+            JSONObject root = new JSONObject(jsonString);
+
+            return root.getBoolean(PROP_SUCCESS);
+        }
+        catch (JSONException e)
+        {
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
+    public static String getSessionIdFromJSON(String jsonString)
+    {
+        try
+        {
+            JSONObject root = new JSONObject(jsonString);
+
+            if (root.getBoolean(PROP_SUCCESS))
+                return root.getString(PROP_SESSION_ID);
+            else
+                return null;
+        }
+        catch (JSONException e)
+        {
+            Log.e(TAG, e.getMessage());
+            return null;
+        }
+
+
     }
 }

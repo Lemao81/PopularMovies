@@ -53,9 +53,7 @@ public class NetUtils
         finally
         {
             if (connection != null)
-            {
                 connection.disconnect();
-            }
         }
         return result;
     }

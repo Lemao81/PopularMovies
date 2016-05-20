@@ -7,11 +7,13 @@ import com.jueggs.popularmovies.event.NetworkStateChangeEvent;
 import com.jueggs.popularmovies.util.NetUtils;
 import org.greenrobot.eventbus.EventBus;
 
+import static com.jueggs.popularmovies.util.NetUtils.*;
+
 public class NetworkChangeReceiver extends BroadcastReceiver
 {
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        EventBus.getDefault().post(new NetworkStateChangeEvent(NetUtils.isNetworkAvailable(context)));
+        EventBus.getDefault().post(new NetworkStateChangeEvent(isNetworkAvailable(context)));
     }
 }

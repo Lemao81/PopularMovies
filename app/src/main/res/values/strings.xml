@@ -3,6 +3,7 @@
 
     <string name="format_title"><xliff:g id="title">Pop Movies - %s</xliff:g></string>
     <string name="title">Pop Movies</string>
+    <string name="title_login">Login</string>
     <string name="title_popular">Most popular</string>
     <string name="title_toprated">Top rated</string>
     <string name="title_favourites">Favourites</string>

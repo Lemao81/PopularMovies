@@ -8,6 +8,8 @@
     
     <color name="black_transparent">#3000</color>
 
+    <color name="semi_transparent">#7fffffff</color>
+
     <color name="dark_grey">#616161</color>
 
     <color name="scrim_item_selection">#55BDBDBD</color>
