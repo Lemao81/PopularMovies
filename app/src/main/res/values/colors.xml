@@ -20,4 +20,6 @@
     <color name="scrim_background_loading">#80000000</color>
 
     <color name="review_card_header">#0097A7</color>
+
+    <color name="action_icon">#FAFAFA</color>
 </resources>

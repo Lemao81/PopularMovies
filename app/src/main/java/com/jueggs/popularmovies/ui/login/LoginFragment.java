@@ -11,18 +11,18 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.service.AuthenticateService;
-import com.jueggs.popularmovies.data.service.FetchRequestTokenService;
-import com.jueggs.popularmovies.data.service.FetchSessionIdService;
+import com.jueggs.popularmovies.data.service.LoginService;
 import com.jueggs.popularmovies.model.Login;
 import com.jueggs.popularmovies.model.Token;
+
+import static com.jueggs.popularmovies.data.service.LoginService.*;
 
 public class LoginFragment extends Fragment
 {
     @Bind(R.id.username) TextInputEditText usernameView;
     @Bind(R.id.password) TextInputEditText passwordView;
 
-    private Login login=new Login();
+    private Login login = new Login();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -39,7 +39,7 @@ public class LoginFragment extends Fragment
         login.setUsername(usernameView.getText().toString());
         login.setPassword(passwordView.getText().toString());
 
-        new FetchRequestTokenService(this::onStartRetrievingRequestToken, this::onRequestTokenRetrieved).execute();
+        new FetchRequestTokenTask(this::onStartRetrievingRequestToken, this::onRequestTokenRetrieved).execute();
     }
 
     private void onStartRetrievingRequestToken()
@@ -52,7 +52,7 @@ public class LoginFragment extends Fragment
         if (token.isSuccess())
         {
             login.setToken(token);
-            new AuthenticateService(this::onAuthenticationStarted,
+            new AuthenticateTask(this::onAuthenticationStarted,
                     this::onAuthenticationCompleted).execute(token.getToken(), login.getUsername(), login.getPassword());
         }
     }
@@ -67,7 +67,7 @@ public class LoginFragment extends Fragment
         if (authenticated)
         {
             login.setAuthenticated(true);
-            new FetchSessionIdService(this::onRetrieveSessionIdStarted, this::onSessionIdRetrieved).execute(login.getToken().getToken());
+            new FetchSessionIdTask(this::onRetrieveSessionIdStarted, this::onSessionIdRetrieved).execute(login.getToken().getToken());
         }
     }
 

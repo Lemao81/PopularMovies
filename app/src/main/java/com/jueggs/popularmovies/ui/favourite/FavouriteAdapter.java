@@ -36,18 +36,17 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     private Callback.MovieSelected movieSelectedCallback;
     private FavouriteCRUDstarted crudStartedCallback;
     private FavouriteCRUDcompleted crudCompletedCallbackExternal;
-    private ViewGroup previousSelection;
+    private int selectedColor = ContextCompat.getColor(context, R.color.scrim_item_selection);
+    private int unselectedColor = ContextCompat.getColor(context, android.R.color.transparent);
     private int selectedPosition;
     private int swipedPosition;
-    private RecyclerView recycler;
 
     public FavouriteAdapter(Context context, Callback.MovieSelected movieSelectedCallback, FavouriteCRUDstarted crudStartedCallback,
-                            FavouriteCRUDcompleted crudCompletedCallback, int selectedPosition, RecyclerView recycler)
+                            FavouriteCRUDcompleted crudCompletedCallback, int selectedPosition)
     {
         super(context, null);
         this.movieSelectedCallback = movieSelectedCallback;
         this.selectedPosition = selectedPosition;
-        this.recycler = recycler;
         this.crudStartedCallback = crudStartedCallback;
         this.crudCompletedCallbackExternal = crudCompletedCallback;
     }
@@ -67,24 +66,20 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         holder.release_date.setText(dateFormat.format(new Date(cursor.getLong(REL_DATE))));
         holder.vote_average.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
         holder.itemView.setOnClickListener(holder);
-
-        if (selectedPosition != NO_SELECTION && selectedPosition == holder.getAdapterPosition())
-            setSelectedMovie(holder.container);
-
         byte[] posterBytes = cursor.getBlob(POSTER);
         if (hasElements(posterBytes))
             holder.thumbnail.setImageDrawable(convertByteArrayToDrawable(context.getResources(), posterBytes));
         else
             loadImage(context, IMG_WIDTH_92, cursor.getString(POSTER_PATH), holder.thumbnail);
+
+        if (App.getInstance().isTwoPane())
+            holder.container.setBackgroundColor(holder.getAdapterPosition() == selectedPosition ? selectedColor : unselectedColor);
     }
 
-    //TODO fix buggy selection
-    public void setSelectedMovie(ViewGroup container)
+    public void setSelectedPosition(int position)
     {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.scrim_item_selection));
-        if (previousSelection != null)
-            previousSelection.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-        previousSelection = container;
+        selectedPosition = position;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -96,35 +91,32 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         cursor.moveToPosition(position);
         int movieId = cursor.getInt(MOVIE_ID);
 
-        new DeleteFavouriteTask(crudStartedCallback, crudCompletedCallbackInternal, context.getContentResolver())
+        new DeleteFavouriteTask(crudStartedCallback, this::onFavouriteCrudCompleted, context.getContentResolver())
                 .execute(Favourite.withMovieId(movieId));
 
         if (App.getInstance().isTwoPane())
             EventBus.getDefault().post(new FavouriteDeletedEvent(movieId));
     }
 
-    private FavouriteCRUDcompleted crudCompletedCallbackInternal = new FavouriteCRUDcompleted()
+    private void onFavouriteCrudCompleted(int result, CRUD operation)
     {
-        @Override
-        public void onFavouriteCRUDcompleted(int result, CRUD operation)
+        String msg;
+        if (result > 0)
         {
-            int stringId;
-            if (result > 0)
-            {
-                stringId = R.string.favourites_removed_msg;
-                if (selectedPosition > swipedPosition)
+            msg = context.getString(R.string.favourites_removed_msg);
+            if (App.getInstance().isTwoPane())
+                if (swipedPosition < selectedPosition)
                     selectedPosition--;
-            }
-            else
-            {
-                stringId = R.string.favourites_removed_error;
-            }
-
-            Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
-
-            crudCompletedCallbackExternal.onFavouriteCRUDcompleted(result, operation);
+                else if (swipedPosition == selectedPosition)
+                    setSelectedPosition(NO_SELECTION);
         }
-    };
+        else
+            msg = context.getString(R.string.favourites_removed_error);
+
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+
+        crudCompletedCallbackExternal.onFavouriteCRUDcompleted(result, operation);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
@@ -144,16 +136,15 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         @Override
         public void onClick(View v)
         {
-            getCursor().moveToPosition(getAdapterPosition());
+            int position = getAdapterPosition();
+
+            getCursor().moveToPosition(position);
             Movie movie = transformCurrentCursorPositionToMovie(getCursor());
 
-            if (previousSelection != container)
-            {
-                selectedPosition = getAdapterPosition();
-                setSelectedMovie(container);
-            }
+            if (App.getInstance().isTwoPane())
+                setSelectedPosition(position);
 
-            movieSelectedCallback.onMovieSelected(movie, getAdapterPosition());
+            movieSelectedCallback.onMovieSelected(movie, position);
         }
     }
 

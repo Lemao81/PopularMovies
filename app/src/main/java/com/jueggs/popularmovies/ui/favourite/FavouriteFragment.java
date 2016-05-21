@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,10 +19,7 @@ import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.Injection;
 import com.jueggs.popularmovies.R;
-import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
-import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
 import com.jueggs.popularmovies.model.Movie;
-import com.jueggs.popularmovies.util.UIUtils;
 
 import static com.jueggs.popularmovies.ui.detail.Callback.*;
 import static com.jueggs.popularmovies.util.UIUtils.*;
@@ -31,7 +27,7 @@ import static com.jueggs.popularmovies.util.UIUtils.*;
 public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, Callback.MovieSelected
 {
     public static final int LOADER_ID = 0;
-    public static final String STATE_SELECTEDPOSITION = "selectedposition";
+    public static final String STATE_SELECTED_POSITION = "selectedposition";
 
     @Bind(R.id.recycler) RecyclerView recycler;
     @Bind(R.id.coverLoading) FrameLayout coverLoading;
@@ -47,7 +43,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         startup = savedInstanceState == null;
 
         if (savedInstanceState != null)
-            selectedPosition = savedInstanceState.getInt(STATE_SELECTEDPOSITION);
+            selectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
         else if (App.getInstance().isTwoPane())
             selectedPosition = 0;
     }
@@ -67,32 +63,23 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, crudStartedCallback, crudCompletedCallback,
-                selectedPosition, recycler));
-//        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
-//            recycler.smoothScrollToPosition(selectedPosition);
+        recycler.setAdapter(adapter = new FavouriteAdapter(getContext(), this, this::onFavouriteCrudStarted, this::onFavouriteCRUDcompleted,
+                selectedPosition));
+
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(recycler);
 
         return view;
     }
 
-    private FavouriteCRUDstarted crudStartedCallback = new FavouriteCRUDstarted()
+    private void onFavouriteCrudStarted()
     {
-        @Override
-        public void onFavouriteCRUDstarted()
-        {
-            showLoading(true, coverLoading);
-        }
-    };
+        showLoading(true, coverLoading);
+    }
 
-    private FavouriteCRUDcompleted crudCompletedCallback = new FavouriteCRUDcompleted()
+    private void onFavouriteCRUDcompleted(int result, CRUD operation)
     {
-        @Override
-        public void onFavouriteCRUDcompleted(int result,CRUD operation)
-        {
-            showLoading(false, coverLoading);
-        }
-    };
+        showLoading(false, coverLoading);
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
@@ -106,17 +93,11 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         adapter.swapCursor(data);
         if (startup && App.getInstance().isTwoPane())
         {
-            new Handler().post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(data);
-                }
-            });
+            new Handler().post(() -> ((Callback.MoviesLoaded) getActivity()).onMoviesLoaded(data));
+            startup = false;
         }
-        //TODO check if this is ok (loadfinished called for every configuration change?)
-        if (selectedPosition != FavouriteAdapter.NO_SELECTION)
+
+        if (App.getInstance().isTwoPane() && selectedPosition != FavouriteAdapter.NO_SELECTION)
             recycler.smoothScrollToPosition(selectedPosition);
     }
 
@@ -136,6 +117,6 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        outState.putInt(STATE_SELECTEDPOSITION, selectedPosition);
+        outState.putInt(STATE_SELECTED_POSITION, selectedPosition);
     }
 }

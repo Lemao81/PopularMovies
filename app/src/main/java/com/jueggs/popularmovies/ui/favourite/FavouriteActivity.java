@@ -29,9 +29,7 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
     public void onMovieSelected(Movie movie, int position)
     {
         if (App.getInstance().isTwoPane())
-        {
             getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
-        }
         else
         {
             Intent intent = new Intent(this, DetailActivity.class);
@@ -47,6 +45,7 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
         if (data.moveToFirst())
             fragment = DetailFragment.createInstance(transformCurrentCursorPositionToMovie(data));
         else
+            //TODO implement
             fragment = new AlternativeFragment();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, fragment).commit();
