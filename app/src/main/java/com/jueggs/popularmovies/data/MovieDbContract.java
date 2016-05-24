@@ -34,12 +34,14 @@ public class MovieDbContract
     public static final String PATH_NEW = "new";
     public static final String PATH_VALIDATE_LOGIN = "validate_with_login";
     public static final String PATH_SESSION = "session";
+    public static final String PATH_ACCOUNT = "account";
 
     public static final String QUERY_KEY_APIKEY = "api_key";
     public static final String QUERY_KEY_YOUTUBE_VIDEO = "v";
     public static final String QUERY_KEY_REQ_TOKEN = "request_token";
     public static final String QUERY_KEY_USERNAME = "username";
     public static final String QUERY_KEY_PASSWORD = "password";
+    public static final String QUERY_KEY_SESSION_ID = "session_id";
 
     public static final int NUM_SORTORDER_PATHS = 2;
     public static final SparseArray<String> SORTORDER_PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
@@ -174,5 +176,12 @@ public class MovieDbContract
                 .appendPath(PATH_SESSION)
                 .appendPath(PATH_NEW)
                 .appendQueryParameter(QUERY_KEY_REQ_TOKEN, reqToken));
+    }
+
+    public static Uri createAccountUri(String sessionId)
+    {
+        return appendApiKeyQuery(BASE_URI.buildUpon()
+                .appendPath(PATH_ACCOUNT)
+                .appendQueryParameter(QUERY_KEY_SESSION_ID, sessionId));
     }
 }

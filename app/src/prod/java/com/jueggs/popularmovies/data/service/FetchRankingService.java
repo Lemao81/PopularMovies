@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
+import com.google.gson.Gson;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.main.Callback;
 import com.jueggs.popularmovies.util.Utils;

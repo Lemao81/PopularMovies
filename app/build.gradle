@@ -81,6 +81,7 @@ dependencies {
     compile "net.simonvt.schematic:schematic:${simonvtSchematicVersion}"
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.guava:guava:19.0'
+    compile 'com.google.code.gson:gson:2.6.2'
 
     androidTestCompile "com.android.support.test.espresso:espresso-core:${espressoVersion}"
     androidTestCompile "com.android.support.test.espresso:espresso-contrib:${espressoVersion}"

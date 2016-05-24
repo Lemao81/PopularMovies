@@ -1,5 +1,6 @@
 package com.jueggs.popularmovies.data.service;
 
+import com.jueggs.popularmovies.model.Account;
 import com.jueggs.popularmovies.model.Token;
 
 public interface Callback
@@ -32,5 +33,10 @@ public interface Callback
     interface RetrieveSessionId
     {
         void onSessionIdRetrieved(String sessionId);
+    }
+
+    interface RetrieveAccount
+    {
+        void onAccountRetrieved(Account account);
     }
 }

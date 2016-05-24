@@ -2,6 +2,7 @@ package com.jueggs.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.google.gson.annotations.SerializedName;
 import com.jueggs.popularmovies.util.Utils;
 
 import java.util.Arrays;
@@ -13,9 +14,12 @@ public class Movie implements Parcelable
     public static final int MAX_GENRE_IDS = 4;
 
     private long dbId;
+    @SerializedName("id")
     private int movieId;
     private String title;
     private Date releaseDate;
+    @SerializedName("release_date")
+    private String releaseDateString;
     private String posterPath;
     private float voteAverage;
     private String overview;
@@ -24,6 +28,10 @@ public class Movie implements Parcelable
     private String originalTitle;
     private String originalLanguage;
     private byte[] poster = new byte[0];
+    private String backdropPath;
+    private float popularity;
+    private boolean video;
+    private int voteCount;
 
     @Override
     public boolean equals(Object other)
@@ -128,6 +136,55 @@ public class Movie implements Parcelable
         }
     };
 
+    public String getBackdropPath()
+    {
+        return backdropPath;
+    }
+
+    public void setBackdropPath(String backdropPath)
+    {
+        this.backdropPath = backdropPath;
+    }
+
+    public float getPopularity()
+    {
+        return popularity;
+    }
+
+    public void setPopularity(float popularity)
+    {
+        this.popularity = popularity;
+    }
+
+    public String getReleaseDateString()
+    {
+        return releaseDateString;
+    }
+
+    public void setReleaseDateString(String releaseDateString)
+    {
+        this.releaseDateString = releaseDateString;
+    }
+
+    public boolean isVideo()
+    {
+        return video;
+    }
+
+    public void setVideo(boolean video)
+    {
+        this.video = video;
+    }
+
+    public int getVoteCount()
+    {
+        return voteCount;
+    }
+
+    public void setVoteCount(int voteCount)
+    {
+        this.voteCount = voteCount;
+    }
 
     public long getDbId()
     {
