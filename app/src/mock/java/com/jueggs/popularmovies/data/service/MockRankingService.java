@@ -1,5 +1,6 @@
 package com.jueggs.popularmovies.data.service;
 
+import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.main.Callback;
 
@@ -25,7 +26,7 @@ public class MockRankingService implements RankingService
         String overviewTopRated1 = "Under the direction of a ruthless instructor, a talented young drummer begins to pursue perfection at any cost, even his humanity.";
         String overviewTopRated2 = "Framed in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope.";
 
-        dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
+        dateFormat = new SimpleDateFormat(DATE_PATTERN_REL_DATE, Locale.ENGLISH);
 
         List<Movie> movies = new ArrayList<>();
         movies.add(new Movie(false, new int[]{28, 53, 878, 0}, 271110, "en", "Captain America: Civil War", overviewPopular1, new byte[0],

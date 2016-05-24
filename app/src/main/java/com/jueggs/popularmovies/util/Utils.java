@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 import com.jueggs.popularmovies.R;
+import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.model.Movie;
 import com.squareup.picasso.Callback;
@@ -126,7 +127,7 @@ public class Utils
         for (int i = 0; i < length && genreIds[i] != 0; i++)
         {
             if (i != 0) sb.append(", ");
-            String genre = GENRES.get(genreIds[i]);
+            String genre = MovieDbContract.GENRES.get(genreIds[i]);
             sb.append(genre != null ? genre : "Unknown");
         }
         return sb.toString();

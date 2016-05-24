@@ -3,11 +3,8 @@ package com.jueggs.popularmovies.data;
 import android.net.Uri;
 import android.util.SparseArray;
 import com.jueggs.popularmovies.BuildConfig;
-import com.jueggs.popularmovies.model.Movie;
-import com.jueggs.popularmovies.model.Review;
-import com.jueggs.popularmovies.model.Trailer;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class MovieDbContract
 {
@@ -45,7 +42,7 @@ public class MovieDbContract
     public static final String QUERY_KEY_PASSWORD = "password";
 
     public static final int NUM_SORTORDER_PATHS = 2;
-    public static final SparseArray<String> PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
+    public static final SparseArray<String> SORTORDER_PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
 
     public static final String API_KEY = BuildConfig.API_KEY;
 
@@ -87,8 +84,8 @@ public class MovieDbContract
 
     static
     {
-        PATHS.put(SORTORDER_POPULAR, PATH_POPULAR);
-        PATHS.put(SORTORDER_TOPRATED, PATH_TOPRATED);
+        SORTORDER_PATHS.put(SORTORDER_POPULAR, PATH_POPULAR);
+        SORTORDER_PATHS.put(SORTORDER_TOPRATED, PATH_TOPRATED);
 
         GENRES.put(28, "Action");
         GENRES.put(12, "Adventure");
@@ -116,7 +113,7 @@ public class MovieDbContract
     {
         return appendApiKeyQuery(BASE_URI.buildUpon()
                 .appendPath(PATH_MOVIE)
-                .appendPath(PATHS.get(sortOrder)));
+                .appendPath(SORTORDER_PATHS.get(sortOrder)));
     }
 
     public static Uri createImageUri(String width, String posterPath)

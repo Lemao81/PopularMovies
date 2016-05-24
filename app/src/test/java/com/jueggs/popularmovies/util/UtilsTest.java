@@ -1,7 +1,9 @@
-package com.jueggs.popularmovies;
+package com.jueggs.popularmovies.util;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.SparseArray;
+import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
 import com.jueggs.popularmovies.data.favourites.FavouriteDb;
 import com.jueggs.popularmovies.model.Movie;
@@ -10,6 +12,7 @@ import com.jueggs.popularmovies.util.Utils;
 import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.Unique;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Test;
 
@@ -178,55 +181,8 @@ public class UtilsTest
         assertThat(actual, is(equalTo(expected)));
     }
 
-    @Test
-    public void transformMovieToContentValues()
-    {
-        //Arrange
-        Movie movie = mock(Movie.class);
-        when(movie.getGenreIds()).thenReturn(new int[]{1,1,1,1});
-        when(movie.getReleaseDate()).thenReturn(new Date(100, 1, 1));
 
-        ContentValues values = mock(ContentValues.class);
-        verify(values);
 
-        //Act
-        Utils.transformMovieToContentValues(movie);
 
-        //Assert
-        verify(movie).getMovieId();
-        verify(movie).getGenreIds();
-        verify(movie).getOriginalLanguage();
-        verify(movie).getPosterPath();
-        verify(movie).getReleaseDate();
-        verify(movie).getTitle();
-        verify(movie).getVoteAverage();
-        verify(movie).getOverview();
-        verify(movie).isAdult();
-        verify(movie).getOriginalTitle();
-
-//        assertTrue(actual.containsKey(FavouriteColumns.MOVIE_ID));
-//        assertTrue(actual.containsKey(FavouriteColumns.TITLE));
-//        assertTrue(actual.containsKey(FavouriteColumns.REL_DATE));
-//        assertTrue(actual.containsKey(FavouriteColumns.POSTER_PATH));
-//        assertTrue(actual.containsKey(FavouriteColumns.VOTE_AVERAGE));
-//        assertTrue(actual.containsKey(FavouriteColumns.OVERVIEW));
-//        assertTrue(actual.containsKey(FavouriteColumns.GENRE_IDS));
-//        assertTrue(actual.containsKey(FavouriteColumns.ADULT));
-//        assertTrue(actual.containsKey(FavouriteColumns.ORIG_TITLE));
-//        assertTrue(actual.containsKey(FavouriteColumns.ORIG_LANG));
-//        assertTrue(actual.containsKey(FavouriteColumns.POSTER));
-//
-//        assertThat((int) actual.get(FavouriteColumns.MOVIE_ID), is(equalTo(movieId)));
-//        assertThat((String) actual.get(FavouriteColumns.TITLE), is(equalTo(title)));
-//        assertThat((long) actual.get(FavouriteColumns.REL_DATE), is(equalTo(relaseDate.getTime())));
-//        assertThat((String) actual.get(FavouriteColumns.POSTER_PATH), is(equalTo(posterPath)));
-//        assertThat((float) actual.get(FavouriteColumns.VOTE_AVERAGE), is(equalTo(voteAverage)));
-//        assertThat((String) actual.get(FavouriteColumns.OVERVIEW), is(equalTo(overview)));
-//        assertThat((long) actual.get(FavouriteColumns.GENRE_IDS), is(equalTo(Utils.encodeGenreIds(genreIds))));
-//        assertThat((boolean) actual.get(FavouriteColumns.ADULT), is(equalTo(adult)));
-//        assertThat((String) actual.get(FavouriteColumns.ORIG_TITLE), is(equalTo(origTitle)));
-//        assertThat((String) actual.get(FavouriteColumns.ORIG_LANG), is(equalTo(origLang)));
-//        assertThat((byte[]) actual.get(FavouriteColumns.POSTER), is(equalTo(poster)));
-    }
 
 }

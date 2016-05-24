@@ -37,7 +37,6 @@ public class FetchRankingService implements RankingService
 
     class FetchAsyncTask extends AsyncTask<Integer, Void, List<Movie>>
     {
-
         @Override
         protected List<Movie> doInBackground(Integer... params)
         {
@@ -64,7 +63,6 @@ public class FetchRankingService implements RankingService
                     callback.onMoviesLoaded(null, sortOrder, RC_ERROR);
                 }
         }
-
     }
 
     public static FetchRankingService getInstance()

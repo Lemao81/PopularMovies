@@ -15,12 +15,15 @@ import org.junit.Test;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
 import static com.jueggs.popularmovies.test.util.TestUtils.*;
 import static com.jueggs.popularmovies.util.Utils.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 
 import static android.support.test.espresso.Espresso.*;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.assertion.ViewAssertions.*;
+import static org.junit.Assert.assertThat;
 
 public class RankingFragmentTest
 {
