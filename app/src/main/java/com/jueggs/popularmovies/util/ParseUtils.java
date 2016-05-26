@@ -35,16 +35,16 @@ public class ParseUtils
 
             for (int i = 0; i < results.length(); i++)
             {
-                Movie movie = new Movie();
+                Movie movie = Movie.builder().build();
                 JSONObject item = (JSONObject) results.get(i);
                 JSONArray genreIds = item.getJSONArray(PROP_GENRE_IDS);
 
-                movie.setMovieId(item.getInt(PROP_ID));
+                movie.setId(item.getInt(PROP_ID));
                 movie.setTitle(item.getString(PROP_TITLE));
                 movie.setOverview(item.getString(PROP_OVERVIEW));
                 movie.setPosterPath(item.getString(PROP_POSTERPATH));
                 movie.setVoteAverage((float) item.getDouble(PROP_VOTEAVERAGE));
-                movie.setReleaseDate(dateFormat.parse(item.getString(PROP_RELEASEDATE)));
+                movie.setReleaseDate(item.getString(PROP_RELEASEDATE));
                 int[] unaligned = toIntArray(genreIds);
                 movie.setGenreIds(Arrays.copyOf(unaligned, 4));
                 movie.setAdult(item.getBoolean(PROP_ADULT));
@@ -54,7 +54,7 @@ public class ParseUtils
                 movies.add(movie);
             }
         }
-        catch (JSONException | ParseException e)
+        catch (JSONException e)
         {
             Log.e(TAG, e.getMessage());
         }

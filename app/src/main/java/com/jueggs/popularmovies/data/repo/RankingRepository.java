@@ -3,10 +3,16 @@ package com.jueggs.popularmovies.data.repo;
 import android.content.Context;
 import android.util.SparseArray;
 import com.jueggs.popularmovies.Injection;
+import com.jueggs.popularmovies.data.MovieDbService;
 import com.jueggs.popularmovies.data.service.RankingService;
 import com.jueggs.popularmovies.model.Movie;
+import com.jueggs.popularmovies.model.Ranking;
 import com.jueggs.popularmovies.ui.main.Callback;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +45,7 @@ public class RankingRepository
     {
         startLoadingCallback.onLoadingMoviesStarted();
 
-        if (!isExpired() && hasElements(cache.get(sortOrder)))
+        if (isUpToDate() && hasElements(cache.get(sortOrder)))
             moviesLoadedCallback.onMoviesLoaded(Collections.unmodifiableList(cache.get(sortOrder)), sortOrder, RC_OK_CACHE);
         else
         {
@@ -72,9 +78,9 @@ public class RankingRepository
             list.clear();
     }
 
-    public boolean isExpired()
+    public boolean isUpToDate()
     {
-        return !isSameDay(this.lastUpdate, new Date());
+        return isSameDay(this.lastUpdate, new Date());
     }
 
     public static RankingRepository getInstance(Context context)

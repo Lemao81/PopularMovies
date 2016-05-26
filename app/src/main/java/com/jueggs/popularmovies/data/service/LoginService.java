@@ -46,19 +46,11 @@ public final class LoginService
 
     public static class AuthenticateTask extends AsyncTask<String, Void, Boolean>
     {
-        private Callback.StartAuthentication startCallback;
         private Callback.Authentication finishCallback;
 
-        public AuthenticateTask(Callback.StartAuthentication startCallback, Callback.Authentication finishCallback)
+        public AuthenticateTask(Callback.Authentication finishCallback)
         {
             this.finishCallback = finishCallback;
-            this.startCallback = startCallback;
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            startCallback.onAuthenticationStarted();
         }
 
         @Override
@@ -77,19 +69,11 @@ public final class LoginService
 
     public static class FetchSessionIdTask extends AsyncTask<String, Void, String>
     {
-        private Callback.StartRetrievingSessionId startCallback;
         private Callback.RetrieveSessionId finishCallback;
 
-        public FetchSessionIdTask(Callback.StartRetrievingSessionId startCallback, Callback.RetrieveSessionId finishCallback)
+        public FetchSessionIdTask(Callback.RetrieveSessionId finishCallback)
         {
             this.finishCallback = finishCallback;
-            this.startCallback = startCallback;
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            startCallback.onRetrievingSessionIdStarted();
         }
 
         @Override

@@ -60,7 +60,7 @@ public class UtilsAndroidTest
 
         Movie actual = new Movie();
         actual.setGenreIds(Utils.decodeGenreIds(values.getAsLong(FavouriteColumns.GENRE_IDS)));
-        actual.setMovieId(values.getAsInteger(FavouriteColumns.MOVIE_ID));
+        actual.setId(values.getAsInteger(FavouriteColumns.MOVIE_ID));
         actual.setPoster(values.getAsByteArray(FavouriteColumns.POSTER));
         actual.setPosterPath(values.getAsString(FavouriteColumns.POSTER_PATH));
         actual.setAdult(values.getAsBoolean(FavouriteColumns.ADULT));

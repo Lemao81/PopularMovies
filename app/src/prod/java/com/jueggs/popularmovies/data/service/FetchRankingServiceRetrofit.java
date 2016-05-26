@@ -24,16 +24,16 @@ import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.util.ParseUtils.*;
 import static com.jueggs.popularmovies.util.NetUtils.*;
 
-public class FetchRankingService implements RankingService
+public class FetchRankingServiceRetrofit implements RankingService
 {
-    public static final String TAG = FetchRankingService.class.getSimpleName();
+    public static final String TAG = FetchRankingServiceRetrofit.class.getSimpleName();
 
-    private static FetchRankingService instance;
+    private static FetchRankingServiceRetrofit instance;
 
     private Callback.MoviesLoaded callback;
     private int sortOrder;
 
-    private FetchRankingService()
+    private FetchRankingServiceRetrofit()
     {
     }
 
@@ -49,15 +49,20 @@ public class FetchRankingService implements RankingService
         @Override
         protected List<Movie> doInBackground(Integer... params)
         {
-            String jsonString = getJsonData(createRankingUri(params[0]));
-
-            if (isEmpty(jsonString))
+            Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URI_STRING)
+                    .addConverterFactory(GsonConverterFactory.create(gson)).build();
+            MovieDbService service = retrofit.create(MovieDbService.class);
+            try
             {
-                Log.e(TAG, "no useful json string retrieved");
+                Ranking ranking = service.loadMostPopularMovies().execute().body();
+                return ranking.getResults();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
                 return null;
             }
-
-            return getMovieListFromJSON(jsonString);
         }
 
         @Override
@@ -74,10 +79,10 @@ public class FetchRankingService implements RankingService
         }
     }
 
-    public static FetchRankingService getInstance()
+    public static FetchRankingServiceRetrofit getInstance()
     {
         if (instance == null)
-            instance = new FetchRankingService();
+            instance = new FetchRankingServiceRetrofit();
         return instance;
     }
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.*;
@@ -52,6 +53,7 @@ public class DetailFragment extends Fragment
     @Bind(R.id.favourite) ImageButton favourite;
     @Bind(R.id.genre) TextView genre;
     @Bind(R.id.coverLoading) FrameLayout coverLoading;
+    @Bind(R.id.scrollview) ScrollView scrollview;
 
     private Movie movie;
     private List<Trailer> trailers;
@@ -63,6 +65,8 @@ public class DetailFragment extends Fragment
     private ContentResolver contentResolver;
     private SimpleDateFormat dateFormat = new SimpleDateFormat(RELEASE_DATE_PATTERN);
     private ShareActionProvider actionProvider;
+    private int headerHeight;
+    private int headerElevation;
 
     public static DetailFragment createInstance(Movie movie)
     {
@@ -86,8 +90,10 @@ public class DetailFragment extends Fragment
         if (movie == null)
             getActivity().finish();
 
-        movieIdUri = Favourite.withMovieId(movie.getMovieId());
+        movieIdUri = Favourite.withMovieId(movie.getId());
         contentResolver = getContext().getContentResolver();
+
+        headerElevation = getResources().getDimensionPixelSize(R.dimen.details_header_elevation);
     }
 
     @Override
@@ -96,15 +102,27 @@ public class DetailFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
 
+        scrollview.getViewTreeObserver().addOnScrollChangedListener(this::onScroll);
+
         bindView(movie);
 
         return view;
     }
 
+    private void onScroll()
+    {
+        ViewCompat.setTranslationZ(title, scrollview.getScrollY() != 0 ? headerElevation : 0);
+
+        float translation = scrollview.getScrollY() * 0.5f;
+        if (headerHeight == 0)
+            headerHeight = title.getHeight();
+        title.setTranslationY(Math.max(-headerHeight, -translation));
+    }
+
     private void bindView(Movie movie)
     {
         title.setText(movie.getTitle());
-        releaseDate.setText(dateFormat.format(movie.getReleaseDate()));
+        releaseDate.setText(dateFormat.format(movie.getReleaseDateAsDate()));
         voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
         overview.setText(movie.getOverview());
         genre.setText(createGenreString(movie.getGenreIds()));
@@ -139,8 +157,8 @@ public class DetailFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
-        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getMovieId(), this::onStartLoadingTrailer, this::onTrailerLoaded);
-        ReviewRepository.getInstance(getContext()).loadReviews(movie.getMovieId(), this::onStartLoadingReviews, this::onReviewsLoaded);
+        TrailerRepository.getInstance(getContext()).loadTrailers(movie.getId(), this::onStartLoadingTrailer, this::onTrailerLoaded);
+        ReviewRepository.getInstance(getContext()).loadReviews(movie.getId(), this::onStartLoadingReviews, this::onReviewsLoaded);
     }
 
     private void onStartLoadingTrailer()
@@ -309,7 +327,7 @@ public class DetailFragment extends Fragment
     public void onFavouriteDeleted(FavouriteDeletedEvent event)
     {
         int movieId = event.movieId;
-        if (movieId == movie.getMovieId())
+        if (movieId == movie.getId())
             removeFavourite();
     }
 
@@ -322,5 +340,13 @@ public class DetailFragment extends Fragment
     private void showToast(int stringId)
     {
         Toast.makeText(getContext(), stringId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        //makes sense? does work with lambda?
+        scrollview.getViewTreeObserver().removeOnScrollChangedListener(this::onScroll);
     }
 }

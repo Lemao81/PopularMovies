@@ -82,6 +82,9 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    provided "org.projectlombok:lombok:1.12.6"
 
     androidTestCompile "com.android.support.test.espresso:espresso-core:${espressoVersion}"
     androidTestCompile "com.android.support.test.espresso:espresso-contrib:${espressoVersion}"

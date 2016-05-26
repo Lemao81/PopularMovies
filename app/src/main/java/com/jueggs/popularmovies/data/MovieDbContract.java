@@ -5,6 +5,7 @@ import android.util.SparseArray;
 import com.jueggs.popularmovies.BuildConfig;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MovieDbContract
 {
@@ -20,6 +21,7 @@ public class MovieDbContract
     public static final int RC_NO_NETWORK = 2;
     public static final int RC_ERROR = 3;
 
+    public static final String BASE_URI_STRING = "http://api.themoviedb.org/3/";
     public static final Uri BASE_URI = Uri.parse("http://api.themoviedb.org/3");
     public static final Uri BASE_URI_IMAGES = Uri.parse("http://image.tmdb.org/t/p");
     public static final Uri BASE_URI_YOUTUBE = Uri.parse("http://www.youtube.com/watch");
@@ -183,5 +185,58 @@ public class MovieDbContract
         return appendApiKeyQuery(BASE_URI.buildUpon()
                 .appendPath(PATH_ACCOUNT)
                 .appendQueryParameter(QUERY_KEY_SESSION_ID, sessionId));
+    }
+
+    public static Builder paths(String... paths)
+    {
+        Builder builder = new Builder(paths);
+        return builder;
+    }
+
+    public static class Builder
+    {
+        String[] paths;
+        HashMap<String, String> queries = new HashMap<>();
+
+        public Builder(String... paths)
+        {
+            this.paths = paths;
+        }
+
+        public Builder query(String key, String value)
+        {
+            queries.put(key, value);
+            return this;
+        }
+
+        public Builder apiKey()
+        {
+            queries.put(QUERY_KEY_APIKEY, API_KEY);
+            return this;
+        }
+
+        public String build()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < paths.length; i++)
+            {
+                if (i != 0)
+                    sb.append("/");
+                sb.append(paths[i]);
+            }
+            if (queries.size() > 0)
+            {
+                sb.append("?");
+                boolean start = true;
+                for (Map.Entry<String, String> entry : queries.entrySet())
+                {
+                    if (!start)
+                        sb.append("&");
+                    sb.append(entry.getKey()).append("=").append(entry.getValue());
+                    start = false;
+                }
+            }
+            return sb.toString();
+        }
     }
 }

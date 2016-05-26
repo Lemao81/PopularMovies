@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,8 @@ import butterknife.ButterKnife;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.Injection;
 import com.jueggs.popularmovies.R;
+import com.jueggs.popularmovies.data.favourites.FavouriteColumns;
+import com.jueggs.popularmovies.data.favourites.FavouritesProvider;
 import com.jueggs.popularmovies.model.Movie;
 
 import static com.jueggs.popularmovies.ui.detail.Callback.*;
@@ -84,7 +87,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
-        return Injection.injectCursorLoader(getContext());
+        return new CursorLoader(getContext(), FavouritesProvider.Favourite.BASE_URI, FavouriteColumns.PROJECTION_COMPLETE, null, null, null);
     }
 
     @Override

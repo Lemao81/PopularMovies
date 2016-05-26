@@ -59,14 +59,8 @@ public class LoginFragment extends Fragment
         if (token.isSuccess())
         {
             login.setToken(token);
-            new AuthenticateTask(this::onAuthenticationStarted,
-                    this::onAuthenticationCompleted).execute(token.getToken(), login.getUsername(), login.getPassword());
+            new AuthenticateTask(this::onAuthenticationCompleted).execute(token.getToken(), login.getUsername(), login.getPassword());
         }
-    }
-
-    private void onAuthenticationStarted()
-    {
-
     }
 
     private void onAuthenticationCompleted(boolean authenticated)
@@ -74,13 +68,8 @@ public class LoginFragment extends Fragment
         if (authenticated)
         {
             login.setAuthenticated(true);
-            new FetchSessionIdTask(this::onRetrieveSessionIdStarted, this::onSessionIdRetrieved).execute(login.getToken().getToken());
+            new FetchSessionIdTask(this::onSessionIdRetrieved).execute(login.getToken().getToken());
         }
-    }
-
-    private void onRetrieveSessionIdStarted()
-    {
-
     }
 
     private void onSessionIdRetrieved(String sessionId)

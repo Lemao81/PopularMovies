@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -57,27 +58,12 @@ public class Utils
 
     public static List<Movie> transformCursorToMovies(Cursor cursor)
     {
-        List<Movie> movies = null;
+        List<Movie> movies = new ArrayList<>();
         if (cursor.moveToFirst())
         {
-            movies = new ArrayList<>();
-
             do
             {
-                Movie movie = new Movie();
-                movie.setDbId(cursor.getLong(_ID));
-                movie.setMovieId(cursor.getInt(MOVIE_ID));
-                movie.setTitle(cursor.getString(TITLE));
-                movie.setReleaseDate(new Date(cursor.getLong(REL_DATE)));
-                movie.setPosterPath(cursor.getString(POSTER_PATH));
-                movie.setVoteAverage(cursor.getFloat(VOTE_AVERAGE));
-                movie.setOverview(cursor.getString(OVERVIEW));
-                movie.setGenreIds(decodeGenreIds(cursor.getLong(GENRE_IDS)));
-                movie.setAdult(cursor.getInt(ADULT) > 0);
-                movie.setOriginalTitle(cursor.getString(ORIG_TITLE));
-                movie.setOriginalLanguage(cursor.getString(ORIG_LANG));
-                movie.setPoster(cursor.getBlob(POSTER));
-
+                Movie movie = transformCurrentCursorPositionToMovie(cursor);
                 movies.add(movie);
             } while (cursor.moveToNext());
         }
@@ -86,18 +72,23 @@ public class Utils
 
     public static Movie transformCurrentCursorPositionToMovie(Cursor cursor)
     {
-        Movie movie = new Movie();
+        Movie movie = Movie.builder().build();
+
         movie.setDbId(cursor.getLong(_ID));
-        movie.setMovieId(cursor.getInt(MOVIE_ID));
-        movie.setTitle(cursor.getString(TITLE));
-        movie.setReleaseDate(new Date(cursor.getLong(REL_DATE)));
         movie.setPosterPath(cursor.getString(POSTER_PATH));
-        movie.setVoteAverage(cursor.getFloat(VOTE_AVERAGE));
-        movie.setOverview(cursor.getString(OVERVIEW));
-        movie.setGenreIds(decodeGenreIds(cursor.getLong(GENRE_IDS)));
         movie.setAdult(cursor.getInt(ADULT) > 0);
+        movie.setOverview(cursor.getString(OVERVIEW));
+        movie.setReleaseDate(cursor.getString(REL_DATE));
+        movie.setGenreIds(decodeGenreIds(cursor.getLong(GENRE_IDS)));
+        movie.setId(cursor.getInt(MOVIE_ID));
         movie.setOriginalTitle(cursor.getString(ORIG_TITLE));
         movie.setOriginalLanguage(cursor.getString(ORIG_LANG));
+        movie.setTitle(cursor.getString(TITLE));
+        movie.setBackdropPath(cursor.getString(BACKDROP_PATH));
+        movie.setPopularity(cursor.getFloat(POPULARITY));
+        movie.setVoteCount(cursor.getInt(VOTE_COUNT));
+        movie.setVideo(cursor.getInt(VIDEO) > 0);
+        movie.setVoteAverage(cursor.getFloat(VOTE_AVERAGE));
         movie.setPoster(cursor.getBlob(POSTER));
 
         return movie;
@@ -106,15 +97,20 @@ public class Utils
     public static ContentValues transformMovieToContentValues(Movie movie)
     {
         ContentValues values = new ContentValues();
-        values.put(FavouriteColumns.ADULT, movie.isAdult());
-        values.put(FavouriteColumns.GENRE_IDS, encodeGenreIds(movie.getGenreIds()));
-        values.put(FavouriteColumns.MOVIE_ID, movie.getMovieId());
-        values.put(FavouriteColumns.ORIG_LANG, movie.getOriginalLanguage());
-        values.put(FavouriteColumns.ORIG_TITLE, movie.getOriginalTitle());
-        values.put(FavouriteColumns.OVERVIEW, movie.getOverview());
+
         values.put(FavouriteColumns.POSTER_PATH, movie.getPosterPath());
+        values.put(FavouriteColumns.ADULT, movie.isAdult());
+        values.put(FavouriteColumns.OVERVIEW, movie.getOverview());
+        values.put(FavouriteColumns.REL_DATE, movie.getReleaseDate());
+        values.put(FavouriteColumns.GENRE_IDS, encodeGenreIds(movie.getGenreIds()));
+        values.put(FavouriteColumns.MOVIE_ID, movie.getId());
+        values.put(FavouriteColumns.ORIG_TITLE, movie.getOriginalTitle());
+        values.put(FavouriteColumns.ORIG_LANG, movie.getOriginalLanguage());
         values.put(FavouriteColumns.TITLE, movie.getTitle());
-        values.put(FavouriteColumns.REL_DATE, movie.getReleaseDate().getTime());
+        values.put(FavouriteColumns.BACKDROP_PATH, movie.getBackdropPath());
+        values.put(FavouriteColumns.POPULARITY, movie.getPopularity());
+        values.put(FavouriteColumns.VOTE_COUNT, movie.getVoteCount());
+        values.put(FavouriteColumns.VIDEO, movie.isVideo());
         values.put(FavouriteColumns.VOTE_AVERAGE, movie.getVoteAverage());
         values.put(FavouriteColumns.POSTER, movie.getPoster());
         return values;
@@ -136,6 +132,9 @@ public class Utils
     //save up to 4 genre ids as 16 bit chunks in a long value for db storage
     public static long encodeGenreIds(int[] ids)
     {
+        if (ids.length < Movie.MAX_GENRE_IDS)
+            ids = Arrays.copyOf(ids, 4);
+
         long encoded = 0;
 
         for (int i = Movie.MAX_GENRE_IDS - 1; i >= 0; i--)
@@ -166,7 +165,7 @@ public class Utils
 
     public static void loadImage(Context context, String width, String posterPath, ImageView view, Callback callback)
     {
-        Uri uri = createImageUri(width, posterPath);
+        Uri uri = createImageUri(width, posterPath.substring(1));
         Picasso.with(context).load(uri).placeholder(R.drawable.picasso_placeholder)
                 .error(R.drawable.picasso_error).into(view, callback);
     }

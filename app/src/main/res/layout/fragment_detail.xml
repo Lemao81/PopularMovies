@@ -4,26 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/details_title_height"
-            android:background="@color/details_title_bg"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:textSize="@dimen/details_title_textsize"
-            android:textStyle="bold"
-            tools:text="Chappie" />
+        android:layout_height="match_parent">
 
         <ScrollView
+            android:id="@+id/scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -35,6 +21,10 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/details_title_height" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -127,7 +117,21 @@
 
             </LinearLayout>
         </ScrollView>
-    </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/details_title_height"
+            android:background="@color/details_title_bg"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:textSize="@dimen/details_title_textsize"
+            android:textStyle="bold"
+            tools:text="Chappie" />
+    </FrameLayout>
 
     <include layout="@layout/include_loading" />
 </FrameLayout>

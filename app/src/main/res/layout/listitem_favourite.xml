@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/grid_selector"
-    android:padding="@dimen/space_normal"
+    android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+    android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+    android:paddingTop="@dimen/space_normal"
+    android:paddingBottom="@dimen/space_normal"
     android:orientation="horizontal">
 
     <com.jueggs.popularmovies.view.ThreeFourLayout
