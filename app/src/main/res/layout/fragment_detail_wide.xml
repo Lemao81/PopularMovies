@@ -44,7 +44,7 @@
                         android:paddingRight="@dimen/space_normal">
 
                         <ImageView
-                            android:id="@+id/thumbnail"
+                            android:id="@+id/poster"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:elevation="8dp"

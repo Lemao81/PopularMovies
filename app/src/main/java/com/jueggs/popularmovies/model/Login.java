@@ -4,7 +4,7 @@ public class Login
 {
     private String username;
     private String password;
-    private Token token;
+    private RequestToken token;
     private boolean authenticated;
     private String sessionId;
 
@@ -28,12 +28,12 @@ public class Login
         this.sessionId = sessionId;
     }
 
-    public Token getToken()
+    public RequestToken getToken()
     {
         return token;
     }
 
-    public void setToken(Token token)
+    public void setToken(RequestToken token)
     {
         this.token = token;
     }

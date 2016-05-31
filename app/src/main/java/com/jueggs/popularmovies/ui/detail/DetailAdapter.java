@@ -53,7 +53,7 @@ public class DetailAdapter
                 ((TextView) view.findViewById(R.id.name)).setText(trailer.getName());
                 String size = String.format(context.getString(R.string.format_trailer_size), trailer.getSize());
                 ((TextView) view.findViewById(R.id.size)).setText(size);
-                String language = new Locale(trailer.getLanguage(), trailer.getRegion()).getDisplayName();
+                String language = new Locale(trailer.getIso6391(), trailer.getIso31661()).getDisplayName();
                 ((TextView) view.findViewById(R.id.language)).setText(language);
             }
         }.createList();
@@ -65,7 +65,7 @@ public class DetailAdapter
             {
                 String author = String.format(context.getString(R.string.format_review_author), review.getAuthor());
                 ((TextView) view.findViewById(R.id.author)).setText(author);
-                ((TextView) view.findViewById(R.id.review)).setText(review.getReview());
+                ((TextView) view.findViewById(R.id.review)).setText(review.getContent());
             }
         }.createList();
     }

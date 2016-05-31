@@ -1,7 +1,6 @@
 package com.jueggs.popularmovies.ui.login;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,10 +13,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.data.service.AccountService;
-import com.jueggs.popularmovies.data.service.LoginService;
 import com.jueggs.popularmovies.model.Account;
 import com.jueggs.popularmovies.model.Login;
-import com.jueggs.popularmovies.model.Token;
+import com.jueggs.popularmovies.model.RequestToken;
 
 import static com.jueggs.popularmovies.data.service.LoginService.*;
 
@@ -54,12 +52,12 @@ public class LoginFragment extends Fragment
 
     }
 
-    private void onRequestTokenRetrieved(Token token)
+    private void onRequestTokenRetrieved(RequestToken token)
     {
         if (token.isSuccess())
         {
             login.setToken(token);
-            new AuthenticateTask(this::onAuthenticationCompleted).execute(token.getToken(), login.getUsername(), login.getPassword());
+            new AuthenticateTask(this::onAuthenticationCompleted).execute(token.getRequestToken(), login.getUsername(), login.getPassword());
         }
     }
 
@@ -68,7 +66,7 @@ public class LoginFragment extends Fragment
         if (authenticated)
         {
             login.setAuthenticated(true);
-            new FetchSessionIdTask(this::onSessionIdRetrieved).execute(login.getToken().getToken());
+            new FetchSessionIdTask(this::onSessionIdRetrieved).execute(login.getToken().getRequestToken());
         }
     }
 

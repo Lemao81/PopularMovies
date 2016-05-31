@@ -15,8 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 public class UtilsAndroidTest
 {
-
-
     @Test
     public void createGenreString()
     {
@@ -40,51 +38,64 @@ public class UtilsAndroidTest
     public void transformMovieToContentValues()
     {
         //Arrange
-        int movieId = 20302;
-        String title = "the title";
-        Date relaseDate = new Date(100, 4, 23);
         String posterPath = "the poster path";
-        float voteAverage = 5.8f;
-        String overview = "the overview";
-        int[] genreIds = new int[]{3, 8, 23, 0};
         boolean adult = true;
+        String overview = "the overview";
+        String releaseDate = "2014-10-23";
+        int[] genreIds = new int[]{3, 8, 23, 0};
+        int movieId = 20302;
         String origTitle = "the origtitle";
         String origLang = "the origlanguage";
+        String title = "the title";
+        String backdropPath = "backdroppath";
+        float popularity = 45.2f;
+        int voteCount=7;
+        boolean video=true;
+        float voteAverage = 5.8f;
         byte[] poster = new byte[]{-2, 5, 2, 5, -53, 34, 53};
 
-        Movie expected = new Movie(adult, genreIds, movieId, origLang, origTitle, overview, poster, posterPath,
-                relaseDate, title, voteAverage);
+        Movie expected = Movie.builder().posterPath(posterPath).adult(adult).overview(overview).releaseDate(releaseDate).genreIds(genreIds)
+                .id(movieId).originalTitle(origTitle).originalLanguage(origLang).title(title).backdropPath(backdropPath).popularity(popularity)
+                .voteCount(voteCount).video(video).voteAverage(voteAverage).poster(poster).build();
 
         //Act
         ContentValues values = Utils.transformMovieToContentValues(expected);
 
-        Movie actual = new Movie();
-        actual.setGenreIds(Utils.decodeGenreIds(values.getAsLong(FavouriteColumns.GENRE_IDS)));
-        actual.setId(values.getAsInteger(FavouriteColumns.MOVIE_ID));
-        actual.setPoster(values.getAsByteArray(FavouriteColumns.POSTER));
+        Movie actual = Movie.builder().build();
         actual.setPosterPath(values.getAsString(FavouriteColumns.POSTER_PATH));
         actual.setAdult(values.getAsBoolean(FavouriteColumns.ADULT));
-        actual.setOriginalLanguage(values.getAsString(FavouriteColumns.ORIG_LANG));
-        actual.setOriginalTitle(values.getAsString(FavouriteColumns.ORIG_TITLE));
         actual.setOverview(values.getAsString(FavouriteColumns.OVERVIEW));
-        actual.setReleaseDate(new Date(values.getAsLong(FavouriteColumns.REL_DATE)));
-        actual.setVoteAverage(values.getAsFloat(FavouriteColumns.VOTE_AVERAGE));
+        actual.setReleaseDate(values.getAsString(FavouriteColumns.REL_DATE));
+        actual.setGenreIds(Utils.decodeGenreIds(values.getAsLong(FavouriteColumns.GENRE_IDS)));
+        actual.setId(values.getAsInteger(FavouriteColumns.MOVIE_ID));
+        actual.setOriginalTitle(values.getAsString(FavouriteColumns.ORIG_TITLE));
+        actual.setOriginalLanguage(values.getAsString(FavouriteColumns.ORIG_LANG));
         actual.setTitle(values.getAsString(FavouriteColumns.TITLE));
+        actual.setBackdropPath(values.getAsString(FavouriteColumns.BACKDROP_PATH));
+        actual.setPopularity(values.getAsFloat(FavouriteColumns.POPULARITY));
+        actual.setVoteCount(values.getAsInteger(FavouriteColumns.VOTE_COUNT));
+        actual.setVideo(values.getAsBoolean(FavouriteColumns.VIDEO));
+        actual.setVoteAverage(values.getAsFloat(FavouriteColumns.VOTE_AVERAGE));
+        actual.setPoster(values.getAsByteArray(FavouriteColumns.POSTER));
 
         //Assert
-        assertTrue(values.containsKey(FavouriteColumns.MOVIE_ID));
-        assertTrue(values.containsKey(FavouriteColumns.TITLE));
-        assertTrue(values.containsKey(FavouriteColumns.REL_DATE));
         assertTrue(values.containsKey(FavouriteColumns.POSTER_PATH));
-        assertTrue(values.containsKey(FavouriteColumns.VOTE_AVERAGE));
-        assertTrue(values.containsKey(FavouriteColumns.OVERVIEW));
-        assertTrue(values.containsKey(FavouriteColumns.GENRE_IDS));
         assertTrue(values.containsKey(FavouriteColumns.ADULT));
+        assertTrue(values.containsKey(FavouriteColumns.OVERVIEW));
+        assertTrue(values.containsKey(FavouriteColumns.REL_DATE));
+        assertTrue(values.containsKey(FavouriteColumns.GENRE_IDS));
+        assertTrue(values.containsKey(FavouriteColumns.MOVIE_ID));
         assertTrue(values.containsKey(FavouriteColumns.ORIG_TITLE));
         assertTrue(values.containsKey(FavouriteColumns.ORIG_LANG));
+        assertTrue(values.containsKey(FavouriteColumns.TITLE));
+        assertTrue(values.containsKey(FavouriteColumns.BACKDROP_PATH));
+        assertTrue(values.containsKey(FavouriteColumns.POPULARITY));
+        assertTrue(values.containsKey(FavouriteColumns.VOTE_COUNT));
+        assertTrue(values.containsKey(FavouriteColumns.VIDEO));
+        assertTrue(values.containsKey(FavouriteColumns.VOTE_AVERAGE));
         assertTrue(values.containsKey(FavouriteColumns.POSTER));
 
-        assertThat(values.size(), is(equalTo(11)));
+        assertThat(values.size(), is(equalTo(15)));
 
         assertThat(actual, is(equalTo(expected)));
     }

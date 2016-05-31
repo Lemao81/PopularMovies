@@ -51,4 +51,6 @@
 
     <string name="ranking_nonetwork">No network connection</string>
     <string name="ranking_nodata">No movie data available</string>
+
+    <string name="transition_poster">transition_poster</string>
 </resources>

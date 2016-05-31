@@ -39,9 +39,10 @@
                         android:paddingRight="@dimen/space_normal">
 
                         <ImageView
-                            android:id="@+id/thumbnail"
+                            android:id="@+id/poster"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:transitionName="@string/transition_poster"
                             android:elevation="8dp"
                             android:scaleType="centerCrop"
                             tools:src="@drawable/interstellar" />

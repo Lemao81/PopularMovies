@@ -1,20 +1,22 @@
 package com.jueggs.popularmovies.data.service;
 
 import android.os.AsyncTask;
-import com.jueggs.popularmovies.model.Token;
+import android.util.Log;
+import com.jueggs.popularmovies.data.MovieDbService;
+import com.jueggs.popularmovies.model.Authentication;
+import com.jueggs.popularmovies.model.RequestToken;
+import com.jueggs.popularmovies.model.Session;
 
-import static com.jueggs.popularmovies.data.MovieDbContract.createAuthenticationUri;
-import static com.jueggs.popularmovies.data.MovieDbContract.createRequestTokenUri;
-import static com.jueggs.popularmovies.data.MovieDbContract.createSessionIdUri;
-import static com.jueggs.popularmovies.util.NetUtils.getJsonData;
-import static com.jueggs.popularmovies.util.ParseUtils.getAuthenticationResultFromJSON;
-import static com.jueggs.popularmovies.util.ParseUtils.getSessionIdFromJSON;
-import static com.jueggs.popularmovies.util.ParseUtils.getTokenFromJSON;
+import java.io.IOException;
+
+import static com.jueggs.popularmovies.data.MovieDbContract.*;
 
 public final class LoginService
 {
-    public static class FetchRequestTokenTask extends AsyncTask<Void, Void, Token>
+    public static class FetchRequestTokenTask extends AsyncTask<Void, Void, RequestToken>
     {
+        public static final String TAG = FetchRequestTokenTask.class.getSimpleName();
+
         private Callback.StartRetrievingRequestToken startCallback;
         private Callback.RetrieveRequestToken finishCallback;
 
@@ -31,13 +33,23 @@ public final class LoginService
         }
 
         @Override
-        protected Token doInBackground(Void... params)
+        protected RequestToken doInBackground(Void... params)
         {
-            return getTokenFromJSON(getJsonData(createRequestTokenUri()));
+            MovieDbService service = createMovieDbService();
+            try
+            {
+                RequestToken token = service.requestRequestToken().execute().body();
+                return token;
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+                return null;
+            }
         }
 
         @Override
-        protected void onPostExecute(Token token)
+        protected void onPostExecute(RequestToken token)
         {
             finishCallback.onRequestTokenRetrieved(token);
         }
@@ -46,6 +58,8 @@ public final class LoginService
 
     public static class AuthenticateTask extends AsyncTask<String, Void, Boolean>
     {
+        public static final String TAG = AuthenticateTask.class.getSimpleName();
+
         private Callback.Authentication finishCallback;
 
         public AuthenticateTask(Callback.Authentication finishCallback)
@@ -56,7 +70,17 @@ public final class LoginService
         @Override
         protected Boolean doInBackground(String... params)
         {
-            return getAuthenticationResultFromJSON(getJsonData(createAuthenticationUri(params[0], params[1], params[2])));
+            MovieDbService service = createMovieDbService();
+            try
+            {
+                Authentication authentication = service.requestAuthentication(params[0], params[1], params[2]).execute().body();
+                return authentication.isSuccess();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+                return null;
+            }
         }
 
         @Override
@@ -69,6 +93,8 @@ public final class LoginService
 
     public static class FetchSessionIdTask extends AsyncTask<String, Void, String>
     {
+        public static final String TAG = FetchSessionIdTask.class.getSimpleName();
+
         private Callback.RetrieveSessionId finishCallback;
 
         public FetchSessionIdTask(Callback.RetrieveSessionId finishCallback)
@@ -79,7 +105,17 @@ public final class LoginService
         @Override
         protected String doInBackground(String... params)
         {
-            return getSessionIdFromJSON(getJsonData(createSessionIdUri(params[0])));
+            MovieDbService service = createMovieDbService();
+            try
+            {
+                Session session = service.requestSession(params[0]).execute().body();
+                return session.getSessionId();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+                return null;
+            }
         }
 
         @Override

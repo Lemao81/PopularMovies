@@ -1,28 +1,17 @@
 package com.jueggs.popularmovies.data.service;
 
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.jueggs.popularmovies.data.MovieDbContract;
 import com.jueggs.popularmovies.data.MovieDbService;
 import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.model.Ranking;
 import com.jueggs.popularmovies.ui.main.Callback;
-import com.jueggs.popularmovies.util.Utils;
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.List;
 
-import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.ParseUtils.*;
-import static com.jueggs.popularmovies.util.NetUtils.*;
 
 public class FetchRankingService implements RankingService
 {
@@ -49,15 +38,32 @@ public class FetchRankingService implements RankingService
         @Override
         protected List<Movie> doInBackground(Integer... params)
         {
-            String jsonString = getJsonData(createRankingUri(params[0]));
+            int sortOrder = params[0];
 
-            if (isEmpty(jsonString))
+            try
             {
-                Log.e(TAG, "no useful json string retrieved");
+                MovieDbService service = createMovieDbService();
+
+                Ranking ranking;
+                switch (sortOrder)
+                {
+                    case SORTORDER_POPULAR:
+                        ranking = service.loadMostPopularMovies().execute().body();
+                        break;
+                    case SORTORDER_TOPRATED:
+                        ranking = service.loadTopRatedMovies().execute().body();
+                        break;
+                    default:
+                        Log.e(TAG, "unknown sortorder, return null");
+                        return null;
+                }
+                return ranking.getResults();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
                 return null;
             }
-
-            return getMovieListFromJSON(jsonString);
         }
 
         @Override

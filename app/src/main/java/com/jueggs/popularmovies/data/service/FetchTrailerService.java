@@ -1,19 +1,16 @@
 package com.jueggs.popularmovies.data.service;
 
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
-import com.jueggs.popularmovies.data.MovieDbContract;
+import com.jueggs.popularmovies.data.MovieDbService;
 import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.model.TrailerRoot;
 import com.jueggs.popularmovies.ui.detail.Callback;
-import com.jueggs.popularmovies.util.Utils;
 
+import java.io.IOException;
 import java.util.List;
 
-import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.ParseUtils.*;
-import static com.jueggs.popularmovies.util.NetUtils.*;
 
 public class FetchTrailerService
 {
@@ -45,15 +42,18 @@ public class FetchTrailerService
         @Override
         protected List<Trailer> doInBackground(Integer... params)
         {
-            String jsonString = getJsonData(createTrailerUri(params[0]));
+            MovieDbService service = createMovieDbService();
 
-            if (isEmpty(jsonString))
+            try
             {
-                Log.e(TAG, "no useful json string retrieved");
+                TrailerRoot root = service.loadTrailer(params[0]).execute().body();
+                return root.getResults();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
                 return null;
             }
-
-            return getTrailerListFromJSON(jsonString);
         }
 
         @Override

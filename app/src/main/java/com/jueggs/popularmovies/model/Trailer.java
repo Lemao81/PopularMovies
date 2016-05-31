@@ -2,36 +2,39 @@ package com.jueggs.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+import lombok.experimental.Builder;
 
+@Data
+@Builder(builderClassName = "Builder")
 public class Trailer implements Parcelable
 {
-    private int movieId;
-    private String language;
-    private String region;
+    private String id;
+    @SerializedName("iso_639_1")
+    private String iso6391;
+    @SerializedName("iso_3166_1")
+    private String iso31661;
     private String key;
     private String name;
+    private String site;
     private int size;
-
-    public Trailer()
-    {
-    }
-
-    protected Trailer(Parcel in)
-    {
-        movieId = in.readInt();
-        language = in.readString();
-        region = in.readString();
-        key = in.readString();
-        name = in.readString();
-        size = in.readInt();
-    }
+    private String type;
 
     public static final Creator<Trailer> CREATOR = new Creator<Trailer>()
     {
         @Override
         public Trailer createFromParcel(Parcel in)
         {
-            return new Trailer(in);
+            return builder()
+                    .id(in.readString())
+                    .iso6391(in.readString())
+                    .iso31661(in.readString())
+                    .key(in.readString())
+                    .name(in.readString())
+                    .site(in.readString())
+                    .size(in.readInt())
+                    .type(in.readString()).build();
         }
 
         @Override
@@ -40,66 +43,6 @@ public class Trailer implements Parcelable
             return new Trailer[size];
         }
     };
-
-    public int getMovieId()
-    {
-        return movieId;
-    }
-
-    public void setMovieId(int id)
-    {
-        this.movieId = id;
-    }
-
-    public String getKey()
-    {
-        return key;
-    }
-
-    public void setKey(String key)
-    {
-        this.key = key;
-    }
-
-    public String getLanguage()
-    {
-        return language;
-    }
-
-    public void setLanguage(String language)
-    {
-        this.language = language;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getRegion()
-    {
-        return region;
-    }
-
-    public void setRegion(String region)
-    {
-        this.region = region;
-    }
-
-    public int getSize()
-    {
-        return size;
-    }
-
-    public void setSize(int size)
-    {
-        this.size = size;
-    }
 
     @Override
     public int describeContents()
@@ -110,11 +53,13 @@ public class Trailer implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeInt(movieId);
-        dest.writeString(language);
-        dest.writeString(region);
+        dest.writeString(id);
+        dest.writeString(iso6391);
+        dest.writeString(iso31661);
         dest.writeString(key);
         dest.writeString(name);
+        dest.writeString(site);
         dest.writeInt(size);
+        dest.writeString(type);
     }
 }

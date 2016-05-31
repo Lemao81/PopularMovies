@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="RankingTheme" parent="AppTheme" />
+
+    <style name="DetailsTheme" parent="AppTheme" />
+
     <style name="LoginTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

@@ -105,9 +105,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onMovieSelected(Movie movie, int position)
+    public void onMovieSelected(Movie movie, int position, View view)
     {
-        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie, position);
+        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie, position, view);
         selectedPosition = position;
     }
 

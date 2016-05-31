@@ -1,19 +1,21 @@
 package com.jueggs.popularmovies.data.service;
 
 import android.os.AsyncTask;
-import com.google.gson.Gson;
-import com.jueggs.popularmovies.data.MovieDbContract;
+import android.util.Log;
+import com.jueggs.popularmovies.data.MovieDbService;
 import com.jueggs.popularmovies.model.Account;
-import com.jueggs.popularmovies.util.NetUtils;
+
+import java.io.IOException;
 
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.NetUtils.*;
 
 public class AccountService
 {
 
     public static class FetchAccountDataTask extends AsyncTask<String, Void, Account>
     {
+        public static final String TAG = FetchAccountDataTask.class.getSimpleName();
+
         private Callback.RetrieveAccount finishCallback;
 
         public FetchAccountDataTask(Callback.RetrieveAccount finishCallback)
@@ -24,8 +26,17 @@ public class AccountService
         @Override
         protected Account doInBackground(String... params)
         {
-            String json = getJsonData(createAccountUri(params[0]));
-            return new Gson().fromJson(json, Account.class);
+            MovieDbService service = createMovieDbService();
+            try
+            {
+                Account account = service.getAccount(params[0]).execute().body();
+                return account;
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+                return null;
+            }
         }
 
         @Override

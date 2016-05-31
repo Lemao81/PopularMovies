@@ -4,17 +4,15 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import com.jueggs.popularmovies.data.MovieDbContract;
+import com.jueggs.popularmovies.data.MovieDbService;
 import com.jueggs.popularmovies.model.Review;
-import com.jueggs.popularmovies.model.Trailer;
+import com.jueggs.popularmovies.model.ReviewRoot;
 import com.jueggs.popularmovies.ui.detail.Callback;
-import com.jueggs.popularmovies.util.Utils;
 
+import java.io.IOException;
 import java.util.List;
 
-import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
-import static com.jueggs.popularmovies.util.ParseUtils.*;
-import static com.jueggs.popularmovies.util.NetUtils.getJsonData;
 
 public class FetchReviewService
 {
@@ -46,15 +44,18 @@ public class FetchReviewService
         @Override
         protected List<Review> doInBackground(Integer... params)
         {
-            String jsonString = getJsonData(createReviewUri(params[0]));
+            MovieDbService service = MovieDbContract.createMovieDbService();
 
-            if (isEmpty(jsonString))
+            try
             {
-                Log.e(TAG, "no useful json string retrieved");
+                ReviewRoot root = service.loadReviews(params[0]).execute().body();
+                return root.getResults();
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
                 return null;
             }
-
-            return getReviewListFromJSON(jsonString);
         }
 
         @Override

@@ -3,16 +3,13 @@ package com.jueggs.popularmovies.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import com.google.gson.annotations.SerializedName;
-import com.jueggs.popularmovies.data.MovieDbContract;
-import com.jueggs.popularmovies.util.Utils;
 import lombok.Data;
 import lombok.experimental.Builder;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
+
+import static com.jueggs.popularmovies.util.DateTimeUtils.*;
 
 @Data
 @Builder(builderClassName = "Builder")
@@ -108,10 +105,9 @@ public class Movie implements Parcelable
 
     public Date getReleaseDateAsDate()
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(MovieDbContract.DATE_PATTERN_REL_DATE);
         try
         {
-            return dateFormat.parse(this.releaseDate);
+            return RELEASE_DATE_FORMATER.parse(this.releaseDate);
         }
         catch (ParseException e)
         {

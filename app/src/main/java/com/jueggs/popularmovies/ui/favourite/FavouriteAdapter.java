@@ -19,9 +19,6 @@ import com.jueggs.popularmovies.model.Movie;
 import com.jueggs.popularmovies.ui.detail.DeleteFavouriteTask;
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_92;
 import static com.jueggs.popularmovies.data.favourites.FavouriteColumns.ProjectionCompleteIndices.*;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
@@ -32,7 +29,6 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
 {
     public static final int NO_SELECTION = -1;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
     private Callback.MovieSelected movieSelectedCallback;
     private FavouriteCRUDstarted crudStartedCallback;
     private FavouriteCRUDcompleted crudCompletedCallbackExternal;
@@ -63,8 +59,8 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
     {
         holder.title.setText(cursor.getString(TITLE));
         holder.genre.setText(createGenreString(decodeGenreIds(cursor.getLong(GENRE_IDS))));
-        holder.release_date.setText(dateFormat.format(new Date(cursor.getLong(REL_DATE))));
-        holder.vote_average.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
+        holder.releaseDate.setText(cursor.getString(REL_DATE).substring(0, 4));
+        holder.voteAverage.setText(String.format(context.getString(R.string.format_vote_average_short), cursor.getFloat(VOTE_AVERAGE)));
         holder.itemView.setOnClickListener(holder);
         byte[] posterBytes = cursor.getBlob(POSTER);
         if (hasElements(posterBytes))
@@ -123,9 +119,9 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
         @Bind(R.id.container) ViewGroup container;
         @Bind(R.id.title) TextView title;
         @Bind(R.id.genre) TextView genre;
-        @Bind(R.id.vote_average) TextView vote_average;
-        @Bind(R.id.release_date) TextView release_date;
-        @Bind(R.id.thumbnail) ImageView thumbnail;
+        @Bind(R.id.vote_average) TextView voteAverage;
+        @Bind(R.id.release_date) TextView releaseDate;
+        @Bind(R.id.poster) ImageView thumbnail;
 
         public ViewHolder(View itemView)
         {
@@ -144,7 +140,7 @@ public class FavouriteAdapter extends CursorRecyclerViewAdapter<FavouriteAdapter
             if (App.getInstance().isTwoPane())
                 setSelectedPosition(position);
 
-            movieSelectedCallback.onMovieSelected(movie, position);
+            movieSelectedCallback.onMovieSelected(movie, position, thumbnail);
         }
     }
 

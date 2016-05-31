@@ -27,7 +27,7 @@ android {
             keyPassword key_password
         }
     }
-    compileOptions{
+    compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -40,7 +40,7 @@ android {
     }
     productFlavors {
         mock {
-
+            applicationIdSuffix = ".mock"
         }
         prod {
 
@@ -63,7 +63,7 @@ android {
 ext {
     simonvtSchematicVersion = "0.6.7"
     supportLibraryVersion = "23.4.0"
-    espressoVersion="2.2.2"
+    espressoVersion = "2.2.2"
 }
 
 dependencies {

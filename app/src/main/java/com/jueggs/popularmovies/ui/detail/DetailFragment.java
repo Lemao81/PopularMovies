@@ -27,13 +27,13 @@ import com.jueggs.popularmovies.model.Trailer;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static android.text.TextUtils.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.*;
 import static com.jueggs.popularmovies.data.MovieDbContract.IMG_WIDTH_185;
 import static com.jueggs.popularmovies.data.favourites.FavouritesProvider.*;
+import static com.jueggs.popularmovies.util.DateTimeUtils.*;
 import static com.jueggs.popularmovies.util.UIUtils.*;
 import static com.jueggs.popularmovies.util.Utils.*;
 
@@ -44,7 +44,7 @@ public class DetailFragment extends Fragment
     public static final String TAG = DetailFragment.class.getSimpleName();
     public static final String STATE_MOVIE = "movie";
 
-    @Bind(R.id.thumbnail) ImageView thumbnail;
+    @Bind(R.id.poster) ImageView thumbnail;
     @Bind(R.id.title) TextView title;
     @Bind(R.id.release_date) TextView releaseDate;
     @Bind(R.id.vote_average) TextView voteAverage;
@@ -63,7 +63,6 @@ public class DetailFragment extends Fragment
     private boolean isFavourite;
     private Uri movieIdUri;
     private ContentResolver contentResolver;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(RELEASE_DATE_PATTERN);
     private ShareActionProvider actionProvider;
     private int headerHeight;
     private int headerElevation;
@@ -122,7 +121,7 @@ public class DetailFragment extends Fragment
     private void bindView(Movie movie)
     {
         title.setText(movie.getTitle());
-        releaseDate.setText(dateFormat.format(movie.getReleaseDateAsDate()));
+        releaseDate.setText(RELEASE_DATE_FORMATER.format(movie.getReleaseDateAsDate()));
         voteAverage.setText(String.format(getString(R.string.format_vote_average), movie.getVoteAverage()));
         overview.setText(movie.getOverview());
         genre.setText(createGenreString(movie.getGenreIds()));

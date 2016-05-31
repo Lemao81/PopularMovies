@@ -2,30 +2,28 @@ package com.jueggs.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import lombok.Data;
+import lombok.experimental.Builder;
 
+@Data
+@Builder(builderClassName = "Builder")
 public class Review implements Parcelable
 {
-    private int movieId;
+    private String id;
     private String author;
-    private String review;
-
-    public Review()
-    {
-    }
-
-    protected Review(Parcel in)
-    {
-        movieId = in.readInt();
-        author = in.readString();
-        review = in.readString();
-    }
+    private String content;
+    private String url;
 
     public static final Creator<Review> CREATOR = new Creator<Review>()
     {
         @Override
         public Review createFromParcel(Parcel in)
         {
-            return new Review(in);
+            return builder()
+                    .id(in.readString())
+                    .author(in.readString())
+                    .content(in.readString())
+                    .url(in.readString()).build();
         }
 
         @Override
@@ -34,36 +32,6 @@ public class Review implements Parcelable
             return new Review[size];
         }
     };
-
-    public int getMovieId()
-    {
-        return movieId;
-    }
-
-    public void setMovieId(int movieId)
-    {
-        this.movieId = movieId;
-    }
-
-    public String getReview()
-    {
-        return review;
-    }
-
-    public void setReview(String review)
-    {
-        this.review = review;
-    }
-
-    public String getAuthor()
-    {
-        return author;
-    }
-
-    public void setAuthor(String author)
-    {
-        this.author = author;
-    }
 
     @Override
     public int describeContents()
@@ -74,8 +42,9 @@ public class Review implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeInt(movieId);
+        dest.writeString(id);
         dest.writeString(author);
-        dest.writeString(review);
+        dest.writeString(content);
+        dest.writeString(url);
     }
 }

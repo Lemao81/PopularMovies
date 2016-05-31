@@ -1,7 +1,7 @@
 package com.jueggs.popularmovies.data.service;
 
 import com.jueggs.popularmovies.model.Account;
-import com.jueggs.popularmovies.model.Token;
+import com.jueggs.popularmovies.model.RequestToken;
 
 public interface Callback
 {
@@ -12,7 +12,7 @@ public interface Callback
 
     interface RetrieveRequestToken
     {
-        void onRequestTokenRetrieved(Token token);
+        void onRequestTokenRetrieved(RequestToken token);
     }
 
     interface StartAuthentication

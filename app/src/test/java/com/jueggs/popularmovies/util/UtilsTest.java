@@ -73,7 +73,7 @@ public class UtilsTest
 
     private Movie createWithGenreIds(int[] ids)
     {
-        Movie movie = new Movie();
+        Movie movie = Movie.builder().build();
         movie.setGenreIds(ids);
         return movie;
     }
@@ -83,36 +83,46 @@ public class UtilsTest
     {
         //Arrange
         long dbId = 1L;
-        int movieId = 20302;
-        String title = "the title";
-        Date relaseDate = new Date(100, 4, 23);
         String posterPath = "the poster path";
-        float voteAverage = 5.8f;
-        String overview = "the overview";
-        int[] genreIds = new int[]{3, 8, 23, 0};
         boolean adult = true;
+        String overview = "the overview";
+        String releaseDate = "2014-10-23";
+        int[] genreIds = new int[]{3, 8, 23, 0};
+        int movieId = 20302;
         String origTitle = "the origtitle";
         String origLang = "the origlanguage";
+        String title = "the title";
+        String backdropPath = "backdroppath";
+        float popularity = 45.2f;
+        int voteCount=7;
+        boolean video=true;
+        float voteAverage = 5.8f;
         byte[] poster = new byte[]{-2, 5, 2, 5, -53, 34, 53};
 
-        Movie expected1 = new Movie(dbId, adult, genreIds, movieId, origLang, origTitle, overview, poster, posterPath,
-                relaseDate, title, voteAverage);
+        Movie expected = Movie.builder().dbId(dbId).posterPath(posterPath).adult(adult).overview(overview).releaseDate(releaseDate).genreIds(genreIds)
+                .id(movieId).originalTitle(origTitle).originalLanguage(origLang).title(title).backdropPath(backdropPath).popularity(popularity)
+                .voteCount(voteCount).video(video).voteAverage(voteAverage).poster(poster).build();
 
         long dbId2 = 2L;
-        int movieId2 = 3324;
-        String title2 = "the other title";
-        Date relaseDate2 = new Date(100, 6, 13);
-        String posterPath2 = "the better poster path";
-        float voteAverage2 = 7.3f;
-        String overview2 = "the greater overview";
-        int[] genreIds2 = new int[]{1, 56, 13, 2};
+        String posterPath2 = "the poster path2";
         boolean adult2 = false;
-        String origTitle2 = "the most origin origtitle";
-        String origLang2 = "the uglier origlanguage";
-        byte[] poster2 = new byte[]{-2, 2, 5, 5, -53, 84, 53};
+        String overview2 = "the overview2";
+        String releaseDate2 = "2013-11-23";
+        int[] genreIds2 = new int[]{1, 8, 13, 0};
+        int movieId2 = 2502;
+        String origTitle2 = "the origtitle2";
+        String origLang2 = "the origlanguage2";
+        String title2 = "the title2";
+        String backdropPath2 = "backdroppath2";
+        float popularity2 = 15.7f;
+        int voteCount2=6;
+        boolean video2=false;
+        float voteAverage2 = 7.8f;
+        byte[] poster2 = new byte[]{-2, 5, 1, 5, -53, 84, 53};
 
-        Movie expected2 = new Movie(dbId2, adult2, genreIds2, movieId2, origLang2, origTitle2, overview2, poster2, posterPath2,
-                relaseDate2, title2, voteAverage2);
+        Movie expected2 = Movie.builder().dbId(dbId2).posterPath(posterPath2).adult(adult2).overview(overview2).releaseDate(releaseDate2).genreIds(genreIds2)
+                .id(movieId2).originalTitle(origTitle2).originalLanguage(origLang2).title(title2).backdropPath(backdropPath2).popularity(popularity2)
+                .voteCount(voteCount2).video(video2).voteAverage(voteAverage2).poster(poster2).build();
 
         Cursor cursor = mock(Cursor.class);
         when(cursor.moveToFirst()).thenReturn(true);
@@ -120,7 +130,7 @@ public class UtilsTest
         when(cursor.getLong(_ID)).thenReturn(dbId, dbId2);
         when(cursor.getInt(MOVIE_ID)).thenReturn(movieId, movieId2);
         when(cursor.getString(TITLE)).thenReturn(title, title2);
-        when(cursor.getLong(REL_DATE)).thenReturn(relaseDate.getTime(), relaseDate2.getTime());
+        when(cursor.getString(REL_DATE)).thenReturn(releaseDate, releaseDate2);
         when(cursor.getString(POSTER_PATH)).thenReturn(posterPath, posterPath2);
         when(cursor.getFloat(VOTE_AVERAGE)).thenReturn(voteAverage, voteAverage2);
         when(cursor.getString(OVERVIEW)).thenReturn(overview, overview2);
@@ -134,7 +144,7 @@ public class UtilsTest
         List<Movie> actual = Utils.transformCursorToMovies(cursor);
 
         //Assert
-        assertThat(actual.get(0), is(equalTo(expected1)));
+        assertThat(actual.get(0), is(equalTo(expected)));
         assertThat(actual.get(1), is(equalTo(expected2)));
     }
 
@@ -143,20 +153,25 @@ public class UtilsTest
     {
         //Arrange
         long dbId = 1L;
-        int movieId = 20302;
-        String title = "the title";
-        Date relaseDate = new Date(100, 4, 23);
         String posterPath = "the poster path";
-        float voteAverage = 5.8f;
-        String overview = "the overview";
-        int[] genreIds = new int[]{3, 8, 23, 0};
         boolean adult = true;
+        String overview = "the overview";
+        String releaseDate = "2014-10-23";
+        int[] genreIds = new int[]{3, 8, 23, 0};
+        int movieId = 20302;
         String origTitle = "the origtitle";
         String origLang = "the origlanguage";
+        String title = "the title";
+        String backdropPath = "backdroppath";
+        float popularity = 45.2f;
+        int voteCount=7;
+        boolean video=true;
+        float voteAverage = 5.8f;
         byte[] poster = new byte[]{-2, 5, 2, 5, -53, 34, 53};
 
-        Movie expected = new Movie(dbId, adult, genreIds, movieId, origLang, origTitle, overview, poster, posterPath,
-                relaseDate, title, voteAverage);
+        Movie expected = Movie.builder().dbId(dbId).posterPath(posterPath).adult(adult).overview(overview).releaseDate(releaseDate).genreIds(genreIds)
+                .id(movieId).originalTitle(origTitle).originalLanguage(origLang).title(title).backdropPath(backdropPath).popularity(popularity)
+                .voteCount(voteCount).video(video).voteAverage(voteAverage).poster(poster).build();
 
         Cursor cursor = mock(Cursor.class);
         when(cursor.moveToFirst()).thenReturn(true);

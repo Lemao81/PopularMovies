@@ -1,10 +1,13 @@
 package com.jueggs.popularmovies.ui.favourite;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import com.jueggs.popularmovies.App;
 import com.jueggs.popularmovies.R;
 import com.jueggs.popularmovies.model.Movie;
@@ -26,15 +29,16 @@ public class FavouriteActivity extends AppCompatActivity implements Callback.Mov
     }
 
     @Override
-    public void onMovieSelected(Movie movie, int position)
+    public void onMovieSelected(Movie movie, int position, View view)
     {
         if (App.getInstance().isTwoPane())
             getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, DetailFragment.createInstance(movie)).commit();
         else
         {
+            ActivityOptionsCompat opts = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view, getString(R.string.transition_poster));
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
-            startActivity(intent);
+            startActivity(intent, opts.toBundle());
         }
     }
 

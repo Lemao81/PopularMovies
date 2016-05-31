@@ -85,7 +85,7 @@ public class RankingFragment extends Fragment
     private void onPosterClicked(AdapterView<?> parent, View view, int position, long id)
     {
         Movie movie = rankingAdapter.getItem(position);
-        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie);
+        ((Callback.MovieSelected) getActivity()).onMovieSelected(movie,view);
         selectedPosition = position;
     }
 

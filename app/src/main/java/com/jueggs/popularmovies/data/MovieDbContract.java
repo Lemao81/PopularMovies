@@ -2,7 +2,12 @@ package com.jueggs.popularmovies.data;
 
 import android.net.Uri;
 import android.util.SparseArray;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jueggs.popularmovies.BuildConfig;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,56 +27,16 @@ public class MovieDbContract
     public static final int RC_ERROR = 3;
 
     public static final String BASE_URI_STRING = "http://api.themoviedb.org/3/";
-    public static final Uri BASE_URI = Uri.parse("http://api.themoviedb.org/3");
     public static final Uri BASE_URI_IMAGES = Uri.parse("http://image.tmdb.org/t/p");
     public static final Uri BASE_URI_YOUTUBE = Uri.parse("http://www.youtube.com/watch");
 
-    public static final String PATH_MOVIE = "movie";
     public static final String PATH_POPULAR = "popular";
     public static final String PATH_TOPRATED = "top_rated";
-    public static final String PATH_VIDEOS = "videos";
-    public static final String PATH_REVIEWS = "reviews";
-    public static final String PATH_AUTHENTICATION = "authentication";
-    public static final String PATH_TOKEN = "token";
-    public static final String PATH_NEW = "new";
-    public static final String PATH_VALIDATE_LOGIN = "validate_with_login";
-    public static final String PATH_SESSION = "session";
-    public static final String PATH_ACCOUNT = "account";
 
-    public static final String QUERY_KEY_APIKEY = "api_key";
     public static final String QUERY_KEY_YOUTUBE_VIDEO = "v";
-    public static final String QUERY_KEY_REQ_TOKEN = "request_token";
-    public static final String QUERY_KEY_USERNAME = "username";
-    public static final String QUERY_KEY_PASSWORD = "password";
-    public static final String QUERY_KEY_SESSION_ID = "session_id";
 
     public static final int NUM_SORTORDER_PATHS = 2;
     public static final SparseArray<String> SORTORDER_PATHS = new SparseArray<>(NUM_SORTORDER_PATHS);
-
-    public static final String API_KEY = BuildConfig.API_KEY;
-
-    public static final String PROP_ID = "id";
-    public static final String PROP_RESULTS = "results";
-    public static final String PROP_TITLE = "title";
-    public static final String PROP_POSTERPATH = "poster_path";
-    public static final String PROP_OVERVIEW = "overview";
-    public static final String PROP_VOTEAVERAGE = "vote_average";
-    public static final String PROP_RELEASEDATE = "release_date";
-    public static final String PROP_LANGUAGE = "iso_639_1";
-    public static final String PROP_REGION = "iso_3166_1";
-    public static final String PROP_KEY = "key";
-    public static final String PROP_NAME = "name";
-    public static final String PROP_SIZE = "size";
-    public static final String PROP_AUTHOR = "author";
-    public static final String PROP_CONTENT = "content";
-    public static final String PROP_ADULT = "adult";
-    public static final String PROP_GENRE_IDS = "genre_ids";
-    public static final String PROP_ORIG_TITLE = "original_title";
-    public static final String PROP_ORIG_LANG = "original_language";
-    public static final String PROP_REQUEST_TOKEN = "request_token";
-    public static final String PROP_SUCCESS = "success";
-    public static final String PROP_EXPIRATION = "expires_at";
-    public static final String PROP_SESSION_ID = "session_id";
 
     public static final String IMG_WIDTH_92 = "w92";
     public static final String IMG_WIDTH_154 = "w154";
@@ -113,11 +78,12 @@ public class MovieDbContract
         GENRES.put(37, "Western");
     }
 
-    public static Uri createRankingUri(int sortOrder)
+    public static MovieDbService createMovieDbService()
     {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_MOVIE)
-                .appendPath(SORTORDER_PATHS.get(sortOrder)));
+        Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URI_STRING)
+                .addConverterFactory(GsonConverterFactory.create(gson)).build();
+        return retrofit.create(MovieDbService.class);
     }
 
     public static Uri createImageUri(String width, String posterPath)
@@ -125,118 +91,9 @@ public class MovieDbContract
         return BASE_URI_IMAGES.buildUpon().appendPath(width).appendPath(posterPath).build();
     }
 
-    public static Uri createTrailerUri(int id)
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_MOVIE)
-                .appendPath(String.valueOf(id))
-                .appendPath(PATH_VIDEOS));
-    }
-
-    public static Uri createReviewUri(int id)
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_MOVIE)
-                .appendPath(String.valueOf(id))
-                .appendPath(PATH_REVIEWS));
-    }
-
-    private static Uri appendApiKeyQuery(Uri.Builder builder)
-    {
-        return builder.appendQueryParameter(QUERY_KEY_APIKEY, API_KEY).build();
-    }
-
     public static Uri createYoutubeUri(String key)
     {
         return BASE_URI_YOUTUBE.buildUpon()
                 .appendQueryParameter(QUERY_KEY_YOUTUBE_VIDEO, key).build();
-    }
-
-    public static Uri createRequestTokenUri()
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_AUTHENTICATION)
-                .appendPath(PATH_TOKEN)
-                .appendPath(PATH_NEW));
-    }
-
-    public static Uri createAuthenticationUri(String reqToken, String username, String password)
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_AUTHENTICATION)
-                .appendPath(PATH_TOKEN)
-                .appendPath(PATH_VALIDATE_LOGIN)
-                .appendQueryParameter(QUERY_KEY_REQ_TOKEN, reqToken)
-                .appendQueryParameter(QUERY_KEY_USERNAME, username)
-                .appendQueryParameter(QUERY_KEY_PASSWORD, password));
-    }
-
-    public static Uri createSessionIdUri(String reqToken)
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_AUTHENTICATION)
-                .appendPath(PATH_SESSION)
-                .appendPath(PATH_NEW)
-                .appendQueryParameter(QUERY_KEY_REQ_TOKEN, reqToken));
-    }
-
-    public static Uri createAccountUri(String sessionId)
-    {
-        return appendApiKeyQuery(BASE_URI.buildUpon()
-                .appendPath(PATH_ACCOUNT)
-                .appendQueryParameter(QUERY_KEY_SESSION_ID, sessionId));
-    }
-
-    public static Builder paths(String... paths)
-    {
-        Builder builder = new Builder(paths);
-        return builder;
-    }
-
-    public static class Builder
-    {
-        String[] paths;
-        HashMap<String, String> queries = new HashMap<>();
-
-        public Builder(String... paths)
-        {
-            this.paths = paths;
-        }
-
-        public Builder query(String key, String value)
-        {
-            queries.put(key, value);
-            return this;
-        }
-
-        public Builder apiKey()
-        {
-            queries.put(QUERY_KEY_APIKEY, API_KEY);
-            return this;
-        }
-
-        public String build()
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < paths.length; i++)
-            {
-                if (i != 0)
-                    sb.append("/");
-                sb.append(paths[i]);
-            }
-            if (queries.size() > 0)
-            {
-                sb.append("?");
-                boolean start = true;
-                for (Map.Entry<String, String> entry : queries.entrySet())
-                {
-                    if (!start)
-                        sb.append("&");
-                    sb.append(entry.getKey()).append("=").append(entry.getValue());
-                    start = false;
-                }
-            }
-            return sb.toString();
-        }
     }
 }
