@@ -29,6 +29,6 @@ To run the app
 
 To run the app you need to retrieve an API key from https://www.themoviedb.org/ and insert it in the local gradle.properties file:
 
----shell
+```shell
 MovieDbApiKey="<your API key>"
----
+```
